@@ -4,20 +4,20 @@
 - Weight is 25% or 5 credits
 
 # Assessment Criteria
-| Basic Functionality                                                                                                        | Marks |
-|----------------------------------------------------------------------------------------------------------------------------|-------|
-| The application has an Activity that allows the user to view the songs / bookmarks on the device (Audiobook list)          | 1     |
-| The application has an Activity that allows the user to set the playback speed and background color (Setting)              | 1     |
-| The application has an Activity that allows the user to play, pause and stop a playing audiobook, as well as Skip track    | 1     |
-| The Activity displays the current progress of the playback and the playback speed                                          | 2     |
-| The currently chosen playback speed is passed to and displayed by the currently playing activity                           | 2     |
-| The Activity maintains speed / playing AudioBook throughout its expected lifecycle (when rotating hone or receiveing call) | 2     |
-| The application has a Service that handles playing the track when another application  is in the foreground                | 2     |
-| The bookmarks load the specified audiobook at the specified time                                                           | 2     |
-| The application displays a notification when a AudioBook is playing                                                        | 2     |
-| Best Practice (and adherence to specification)                                                                             |       |
-| The application supports appropriate navigation, and appropriate between and management of components. good design.        | 15    |
-| Total                                                                                                                      | 30    |
+| Basic Functionality                                                                                                        | Marks | Status |
+|----------------------------------------------------------------------------------------------------------------------------|-------|--------|
+| The application has an Activity that allows the user to view the songs / bookmarks on the device (Audiobook list)          | 1     |        |
+| The application has an Activity that allows the user to set the playback speed and background color (Setting)              | 1     |        |
+| The application has an Activity that allows the user to play, pause and stop a playing audiobook, as well as Skip track    | 1     |        |
+| The Activity displays the current progress of the playback and the playback speed                                          | 2     |        |
+| The currently chosen playback speed is passed to and displayed by the currently playing activity                           | 2     |        |
+| The Activity maintains speed / playing AudioBook throughout its expected lifecycle (when rotating hone or receiveing call) | 2     |        |
+| The application has a Service that handles playing the track when another application  is in the foreground                | 2     |        |
+| The bookmarks load the specified audiobook at the specified time                                                           | 2     |        |
+| The application displays a notification when a AudioBook is playing                                                        | 2     |        |
+| Best Practice (and adherence to specification)                                                                             |       |        |
+| The application supports appropriate navigation, and appropriate between and management of components. good design.        | 15    |        |
+| Total                                                                                                                      | 30    |        |
 
 # Step-by-Step Outline
 
