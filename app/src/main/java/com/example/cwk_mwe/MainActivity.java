@@ -31,26 +31,21 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // Set R values as integers so we can use them in a switch case statement
-        int homeId = R.id.nav_home;
-        int playerId = R.id.nav_player;
-        int settingsId = R.id.nav_settings;
-
         // Set the default selected item
-        bottomNavigationView.setSelectedItemId(homeId);
+        bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
         // Set a listener to handle item selection
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == homeId) {
+            if (itemId == R.id.nav_home) {
                 startActivity(new Intent(MainActivity.this, HomeActivity.class));
                 overridePendingTransition(0, 0); // No animation for smoother switch
                 return true;
-            } else if (itemId == playerId) {
+            } else if (itemId == R.id.nav_player) {
                     startActivity(new Intent(MainActivity.this, PlayerActivity.class));
                     overridePendingTransition(0, 0);
                     return true;
-            } else if (itemId == settingsId){
+            } else if (itemId == R.id.nav_settings){
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                     overridePendingTransition(0, 0);
                     return true;
