@@ -16,6 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Bottom Navigation View -->
     <FrameLayout
         android:id="@+id/flFragment"
         android:layout_width="match_parent"

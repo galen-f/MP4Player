@@ -26,12 +26,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // Set the default selected item
+        // Set the selected item (navbar)
         bottomNavigationView.setSelectedItemId(R.id.nav_home);
 
         // Set a listener to handle item selection

@@ -14,8 +14,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // Set the default selected item
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        // Set the selected item (navbar)
+        bottomNavigationView.setSelectedItemId(R.id.nav_settings);
 
         // Set a listener to handle item selection
         bottomNavigationView.setOnItemSelectedListener(item -> {
