@@ -25,6 +25,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Home Activity -->
+        <activity android:name=".HomeActivity" />
+
+        <!-- Player Activity -->
+        <activity android:name=".PlayerActivity" />
+
+        <!-- Settings Activity -->
+        <activity android:name=".SettingsActivity" />
     </application>
 
 </manifest>
