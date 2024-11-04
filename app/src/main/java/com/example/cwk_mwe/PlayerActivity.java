@@ -21,7 +21,7 @@ public class PlayerActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
-                startActivity(new Intent(PlayerActivity.this, HomeActivity.class));
+                startActivity(new Intent(PlayerActivity.this, MainActivity.class));
                 overridePendingTransition(0, 0); // No animation for smoother switch
                 return true;
             } else if (itemId == R.id.nav_player) {
