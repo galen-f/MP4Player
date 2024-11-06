@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,10 +15,20 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import android.os.Environment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+public class MainActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private MusicRecyclerViewAdapter adapter;
+    private List<TrackData> trackData = new ArrayList<>();
     private AudiobookPlayer audiobookPlayer;
     private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO = 1;
 
@@ -51,6 +60,18 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         });
+
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Set adapter with empty list initially
+        adapter = new MusicRecyclerViewAdapter(this, trackData, filePath -> {
+            // Handle click, pass filePath to PlayerActivity
+            Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+            intent.putExtra("FILE_PATH", filePath);
+            startActivity(intent);
+        });
+        recyclerView.setAdapter(adapter);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -98,8 +119,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void loadAudiobook() {
-        audiobookPlayer.load("/storage/self/primary/Music/podcast-smooth-jazz-instrumental-music-225674.mp3", 1);
-
+    protected void loadAudiobook() {
+        // Instead of loading one file, we populate the RecyclerView with all audio files
+        File musicDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Music");
+        if (musicDir.exists() && musicDir.isDirectory()) {
+            File[] files = musicDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile() && file.getName().endsWith(".mp3")) { // Ignore if not an audio file
+                        trackData.add(new TrackData(file.getName(), file.getAbsolutePath()));
+                    }
+                }
+                // Notify adapter about data change
+                adapter.notifyDataSetChanged();
+            }
+        } else {
+            Toast.makeText(this, "No Music Directory Found", Toast.LENGTH_SHORT).show();
+        }
     }
 }
