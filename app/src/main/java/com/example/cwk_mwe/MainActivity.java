@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             // Handle click, pass filePath to PlayerActivity
             Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
             intent.putExtra("FILE_PATH", filePath);
+            Log.d("MainActivity", "Passing file path to PlayerActivity: " + filePath);
             startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
