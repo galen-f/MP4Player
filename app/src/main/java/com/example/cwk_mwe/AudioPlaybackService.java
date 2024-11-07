@@ -64,9 +64,14 @@ public class AudioPlaybackService extends Service {
     }
 
     private Notification createNotification(String contentText) {
+        // Intent
         Intent notificationIntent = new Intent(this, PlayerActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Audiobook Player")
                 .setContentText(contentText)
