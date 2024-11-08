@@ -29,7 +29,6 @@ public class AudioService extends Service {
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
-        testNotification();
     }
 
     @Override
@@ -181,14 +180,5 @@ public class AudioService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
-    }
-
-    private void testNotification() {
-        Notification notification = buildNotification("Test Notification");
-        NotificationManager manager = getSystemService(NotificationManager.class);
-        if (manager != null) {
-            manager.notify(1, notification); // Test showing the notification
-            Log.d("AudioService", "Test notification sent");
-        }
     }
 }
