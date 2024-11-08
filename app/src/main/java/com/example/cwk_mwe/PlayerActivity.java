@@ -33,7 +33,7 @@ public class PlayerActivity extends AppCompatActivity {
             int duration = intent.getIntExtra("duration", 0);
             seekBar.setMax(duration);
             seekBar.setProgress(currentPosition);
-            Log.d("PlayerActivity", "Current seekbar position: " + currentPosition + "Duration: " + duration);
+//            Log.d("PlayerActivity", "Current seekbar position: " + currentPosition + ", Duration: " + duration); // Debug log (triggers every second so left out for now)
         }
     };
 
