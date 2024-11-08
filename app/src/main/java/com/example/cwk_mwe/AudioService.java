@@ -29,6 +29,7 @@ public class AudioService extends Service {
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
+        testNotification();
     }
 
     @Override
@@ -95,8 +96,16 @@ public class AudioService extends Service {
     private void play() {
         if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
             mediaPlayer.start();
-            startForeground(1, buildNotification("Playing Audio"));
-            Log.d("AudioService.play", "Audio Play");
+
+            Notification notification = buildNotification("Playing Audio");
+
+            if (notification != null) {
+                startForeground(1, notification);
+                Log.d("AudioService.play", "Audio Play, notification built successfully");
+            } else {
+                Log.e("AudioService.play", "Audio error: notification is null");
+            }
+
         } else if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             Log.e("AudioService.play", "Audio error: mediaPlayer is already playing");
         } else if (mediaPlayer == null) {
@@ -121,7 +130,7 @@ public class AudioService extends Service {
                 .setContentTitle("Audio Service")
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_music_notif)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .build();
     }
 
@@ -130,10 +139,15 @@ public class AudioService extends Service {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "Audio Service Channel",
-                    NotificationManager.IMPORTANCE_LOW
+                    NotificationManager.IMPORTANCE_DEFAULT
             );
             NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
+            if (manager != null) {
+                manager.createNotificationChannel(serviceChannel);
+                Log.d("AudioService.createNotificationChannel", "Notification Channel Created");
+            } else {
+                Log.e("AudioService.createNotificationChannel", "Notification Manager is null");
+            }
         }
     }
 
@@ -167,5 +181,14 @@ public class AudioService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    private void testNotification() {
+        Notification notification = buildNotification("Test Notification");
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.notify(1, notification); // Test showing the notification
+            Log.d("AudioService", "Test notification sent");
+        }
     }
 }

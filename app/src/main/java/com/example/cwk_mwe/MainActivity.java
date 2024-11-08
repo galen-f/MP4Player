@@ -3,6 +3,7 @@ package com.example.cwk_mwe;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private MusicRecyclerViewAdapter adapter;
     private List<TrackData> trackData = new ArrayList<>();
     private AudiobookPlayer audiobookPlayer;
-    private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO = 1;
+    private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO_AND_NOTIFICATIONS = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,37 +87,67 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkAndRequestPermissions() {
+        // List of permissions to request
+        List<String> permissionsToRequest = new ArrayList<>();
+
+        // Check READ_MEDIA_AUDIO permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_MEDIA_AUDIO)) {
+            permissionsToRequest.add(Manifest.permission.READ_MEDIA_AUDIO);
+        }
+
+        // Check POST_NOTIFICATIONS permission for Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS);
+        }
+
+        // Request permissions if any are missing
+        if (!permissionsToRequest.isEmpty()) {
+            // Show rationale if needed
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_MEDIA_AUDIO) ||
+                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS))) {
+
                 new AlertDialog.Builder(this)
-                        .setTitle("Permission needed")
-                        .setMessage("This permission is needed to access the music files on your device.")
+                        .setTitle("Permissions Needed")
+                        .setMessage("These permissions are needed to access music files and display notifications.")
                         .setPositiveButton("OK", (dialog, which) -> ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.READ_MEDIA_AUDIO},
-                                MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO))
+                                permissionsToRequest.toArray(new String[0]),
+                                MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO_AND_NOTIFICATIONS))
                         .create()
                         .show();
             } else {
+                // Request the permissions directly
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_MEDIA_AUDIO},
-                        MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO);
+                        permissionsToRequest.toArray(new String[0]),
+                        MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO_AND_NOTIFICATIONS);
             }
         } else {
-            // Permission already granted, load the audiobook
+            // All permissions are granted, load the audiobook
             loadAudiobook();
-
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission was granted, load the audiobook
+
+        if (requestCode == MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO_AND_NOTIFICATIONS) {
+            boolean allPermissionsGranted = true;
+
+            // Check if all permissions were granted
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
+                    break;
+                }
+            }
+
+            if (allPermissionsGranted) {
+                // All required permissions were granted
                 loadAudiobook();
             } else {
-                Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show(); // Permission denied, show a toast
+                // Some permission was denied
+                Toast.makeText(this, "Permissions DENIED. Cannot load audiobook.", Toast.LENGTH_SHORT).show();
             }
         }
     }
