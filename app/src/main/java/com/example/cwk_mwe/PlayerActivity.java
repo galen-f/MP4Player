@@ -30,7 +30,10 @@ public class PlayerActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             int currentPosition = intent.getIntExtra("current_position", 0);
+            int duration = intent.getIntExtra("duration", 0);
+            seekBar.setMax(duration);
             seekBar.setProgress(currentPosition);
+            Log.d("PlayerActivity", "Current seekbar position: " + currentPosition + "Duration: " + duration);
         }
     };
 
@@ -38,6 +41,10 @@ public class PlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+
+        // Register positionReceiver to update SeekBar
+        LocalBroadcastManager.getInstance(this).registerReceiver(positionReceiver,
+                new IntentFilter("position_update"));
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
@@ -76,6 +83,7 @@ public class PlayerActivity extends AppCompatActivity {
                     intent.setAction(AudioService.ACTION_SEEK);
                     intent.putExtra("seek_position", progress);
                     startService(intent);
+                    Log.d("PlayerActivity", "Seekbar progress (inside loop): " + progress);
                 }
             }
 

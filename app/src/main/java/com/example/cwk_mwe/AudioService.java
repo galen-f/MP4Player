@@ -22,7 +22,6 @@ public class AudioService extends Service {
     public static final String ACTION_STOP = "com.example.cwk_mwe.ACTION_STOP";
     public static final String ACTION_SEEK = "com.example.cwk_mwe.ACTION_SEEK";
     public static final String CHANNEL_ID = "AudioServiceChannel";
-
     private MediaPlayer mediaPlayer;
     private Handler handler = new Handler();
 
@@ -143,8 +142,11 @@ public class AudioService extends Service {
         public void run() {
             if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                 int currentPosition = mediaPlayer.getCurrentPosition();
+                int duration = mediaPlayer.getDuration();
+
                 Intent intent = new Intent("position_update");
                 intent.putExtra("current_position", currentPosition);
+                intent.putExtra("duration", duration);
                 LocalBroadcastManager.getInstance(AudioService.this).sendBroadcast(intent);
                 handler.postDelayed(this, 1000);
             }
