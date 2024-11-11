@@ -27,6 +27,18 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO:
+// - fix the old AudiobookPlayer class
+// - Make the notification redirect to the player
+// - Add the name of the track to the player screen
+// - Add dark-mode
+// - Add Playback speed settings
+// - Bookmarks feature
+// - Auto Play after track select?
+// - Skip Track feature
+// - Remove Navbar
+// - Make the seekbar something you can't interact with
+
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MusicRecyclerViewAdapter adapter;
