@@ -71,7 +71,6 @@ public class PlayerActivity extends AppCompatActivity {
         });
 
         seekBar = findViewById(R.id.seekBar);
-
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -83,7 +82,7 @@ public class PlayerActivity extends AppCompatActivity {
                     intent.setAction(AudioService.ACTION_SEEK);
                     intent.putExtra("seek_position", progress);
                     startService(intent);
-                    Log.d("PlayerActivity", "Seekbar progress (inside loop): " + progress);
+                    //Log.d("PlayerActivity", "Seekbar progress (inside loop): " + progress);
                 }
             }
 
@@ -104,10 +103,15 @@ public class PlayerActivity extends AppCompatActivity {
         pauseButton.setOnClickListener(v -> togglePause());
         stopButton.setOnClickListener(v -> stopAudioService());
 
-        if (filePath == null) {
-            Toast.makeText(this, "Error: No file selected", Toast.LENGTH_SHORT).show();
+        // Start the service on creation if a file path is provided
+        if (filePath != null) {
+            Intent intent = new Intent(this, AudioService.class);
+            intent.putExtra("FILE_PATH", filePath);
+            //intent.setAction(AudioService.ACTION_PLAY);
+            startService(intent);
+            isPlaying = true; // Set isPlaying to true since we're starting playback
         } else {
-            Log.d("PlayerActivity", "File path: " + filePath);
+            Toast.makeText(this, "Error: No file selected", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -132,7 +136,7 @@ public class PlayerActivity extends AppCompatActivity {
             Intent intent = new Intent(this, AudioService.class);
             if (isPlaying) {
                 intent.setAction(AudioService.ACTION_PAUSE);
-                Log.d("PlayerActivity", "Pause command sent");
+                //Log.d("PlayerActivity", "Pause command sent");
                 isPlaying = false;
             } else {
                 Toast.makeText(this, "Audio is already paused", Toast.LENGTH_SHORT).show();
@@ -146,7 +150,6 @@ public class PlayerActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AudioService.class);
         intent.setAction(AudioService.ACTION_STOP);
         startService(intent);
-        playButton.setText("Play");
         isPlaying = false;
     }
 

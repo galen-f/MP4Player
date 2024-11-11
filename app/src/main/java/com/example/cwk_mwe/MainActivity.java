@@ -37,6 +37,7 @@ import java.util.List;
 // - Skip Track feature
 // - Remove Navbar
 // - Make the seekbar something you can't interact with
+// - Stop button functionality is not clear.
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             // Handle click, pass filePath to PlayerActivity
             Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
             intent.putExtra("FILE_PATH", filePath);
-            Log.d("MainActivity", "Passing file path to PlayerActivity: " + filePath);
+            //Log.d("MainActivity", "Passing file path to PlayerActivity: " + filePath);
             startActivity(intent);
         });
         recyclerView.setAdapter(adapter);
