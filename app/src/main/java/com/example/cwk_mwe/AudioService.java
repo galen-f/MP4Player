@@ -5,8 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Build;
@@ -22,7 +20,7 @@ public class AudioService extends Service {
     public static final String ACTION_STOP = "com.example.cwk_mwe.ACTION_STOP";
     public static final String ACTION_SEEK = "com.example.cwk_mwe.ACTION_SEEK";
     public static final String CHANNEL_ID = "AudioServiceChannel";
-    private MediaPlayer mediaPlayer;
+    private AudiobookPlayer audiobookPlayer;
     private Handler handler = new Handler();
 
     @Override
@@ -37,96 +35,72 @@ public class AudioService extends Service {
         String filePath = intent.getStringExtra("FILE_PATH");
 
         if (filePath != null) {
-            Log.d("AudioService", "Audio Service Started with file path: " + filePath);
-        } else if (filePath == null) {
-            Log.d("AudioService", "No file path provided");
+            // Case if file path is provided and all is well
+            if (audiobookPlayer == null) {
+                // Case if AudiobookPlayer is not initialized, initialize it
+                audiobookPlayer = new AudiobookPlayer();
+                audiobookPlayer.load(filePath, 1.0f); // Load with normal playback speed
+                Log.d("AudioService", "Audio Service Started with file path: " + filePath);
+            } else if (!filePath.equals(audiobookPlayer.getFilePath())) {
+                // Case if a different file is provided, stop current playback and load the new file
+                audiobookPlayer.stop();
+                audiobookPlayer.load(filePath, 1.0f); // Load new track with normal playback speed
+                Log.d("AudioService", "Audio Service loaded new file path: " + filePath);
+            }
+        } else if (audiobookPlayer == null) {
+            // Case if no file path is provided and AudiobookPlayer is not initialized
+            Log.e("AudioService", "No file path provided, and AudiobookPlayer is not initialized.");
+            stopSelf();
+            return START_NOT_STICKY;
         }
 
-        if (filePath != null && mediaPlayer == null) {
-            initializeMediaPlayer(filePath);
-        }
-
-        if (action != null) {
+        if (action != null && audiobookPlayer != null) {
             switch (action) {
                 case ACTION_PLAY:
-                    Log.d("AudioService", "Play Command Received");
-                    play();
-                    break;
-                case ACTION_PAUSE:
-                    Log.d("AudioService", "Pause Command Received");
-                    pause();
-                    break;
-                case ACTION_STOP:
-                    Log.d("AudioService", "Stop Command Received");
-                    stopSelf();
-                    break;
-                case ACTION_SEEK:
-                    Log.d("AudioService", "Seek Command Received");
-                    int seekPosition = intent.getIntExtra("seek_position", 0);
-                    if (mediaPlayer != null) {
-                        mediaPlayer.seekTo(seekPosition);
+                    if (audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PAUSED || audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.STOPPED) {
+                        Log.d("AudioService", "Play Command Received");
+                        audiobookPlayer.play();
+                        startForeground(1, buildNotification("Playing Audio"));
+                    } else {
+                        Log.d("AudioService", "Audio is already playing (play command ignored)");
                     }
                     break;
+
+                case ACTION_PAUSE:
+                    if (audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PLAYING) {
+                        Log.d("AudioService", "Pause Command Received");
+                        audiobookPlayer.pause();
+                        stopForeground(false);
+                    } else {
+                        Log.d("AudioService", "Audio is already paused (pause command ignored)");
+                    }
+                    break;
+
+                case ACTION_STOP:
+                    Log.d("AudioService", "Stop Command Received");
+                    audiobookPlayer.stop();
+                    stopForeground(true);
+                    audiobookPlayer = null; // Release Player instance
+                    break;
+
+                case ACTION_SEEK:
+                    int seekPosition = intent.getIntExtra("seek_position", 0);
+                    Log.d("AudioService", "Seek Command Received" + seekPosition);
+                    audiobookPlayer.skipTo(seekPosition);
+                    break;
+
             }
-        }
-        return START_NOT_STICKY;
-    }
-
-    private void initializeMediaPlayer(String filePath) {
-        Log.d("AudioService", "Audio Player Initialized");
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .build());
-        try {
-            mediaPlayer.setDataSource(filePath);
-            mediaPlayer.prepare();
-            mediaPlayer.setOnPreparedListener(mp -> {
-                // Start sending updates
-                handler.post(updateSeekBarRunnable);
-            });
-        } catch (Exception e) {
-            Log.e("AudioService", "Error initializing media player: " + e.getMessage());
-            stopSelf();
-        }
-    }
-
-    private void play() {
-        if (mediaPlayer != null && !mediaPlayer.isPlaying()) {
-            mediaPlayer.start();
-
-            Notification notification = buildNotification("Playing Audio");
-
-            if (notification != null) {
-                startForeground(1, notification);
-                Log.d("AudioService.play", "Audio Play, notification built successfully");
-            } else {
-                Log.e("AudioService.play", "Audio error: notification is null");
-            }
-
-        } else if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            Log.e("AudioService.play", "Audio error: mediaPlayer is already playing");
-        } else if (mediaPlayer == null) {
-            Log.e("AudioService.play", "Audio error: mediaPlayer is null");
-
-        }
-    }
-
-    private void pause() {
-        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            stopForeground(false);
-            Log.d("AudioService.pause", "Audio Pause");
         } else {
-            Log.e("AudioService.play", "Audio error");
+            Log.e("AudioService.onStartCommand", "Action or audiobookPlayer is null");
         }
+
+        return START_NOT_STICKY;
     }
 
     private Notification buildNotification(String contentText) {
         Log.d("AudioService.buildNotification", "Notification Built");
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("Audio Service")
+                .setContentTitle("Galen's MP3 Player")
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_music_notif)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -153,14 +127,16 @@ public class AudioService extends Service {
     private Runnable updateSeekBarRunnable = new Runnable() {
         @Override
         public void run() {
-            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                int currentPosition = mediaPlayer.getCurrentPosition();
-                int duration = mediaPlayer.getDuration();
+            if (audiobookPlayer != null && audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PLAYING) {
+                int currentPosition = audiobookPlayer.getProgress();
+                int duration = audiobookPlayer.mediaPlayer != null ? audiobookPlayer.mediaPlayer.getDuration() : 0;
 
                 Intent intent = new Intent("position_update");
                 intent.putExtra("current_position", currentPosition);
                 intent.putExtra("duration", duration);
                 LocalBroadcastManager.getInstance(AudioService.this).sendBroadcast(intent);
+
+                // Update position every second
                 handler.postDelayed(this, 1000);
             }
         }
@@ -169,9 +145,9 @@ public class AudioService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
+        if (audiobookPlayer != null) {
+            audiobookPlayer.stop();
+            audiobookPlayer = null;
             Log.d("AudioService.onDestroy", "Audio service destroyed");
         }
     }

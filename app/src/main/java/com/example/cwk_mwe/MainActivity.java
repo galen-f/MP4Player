@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO:
-// - fix the old AudiobookPlayer class
 // - Make the notification redirect to the player
 // - Add the name of the track to the player screen
 // - Add dark-mode
