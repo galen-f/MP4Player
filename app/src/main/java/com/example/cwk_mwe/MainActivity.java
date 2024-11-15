@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -28,18 +29,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO:
-// - Make the notification redirect to the player
-// - Add the name of the track to the player screen
-// - Add dark-mode
+// - Add Color Changer
 // - Add Playback speed settings
 // - Bookmarks feature
-// - Auto Play after track select?
 // - Skip Track feature
-// - Remove Navbar
+// - Stop button does not nullify isPlaying it seems
+// - is isplaying even necessary?
 // - Make the seekbar something you can't interact with
 // - Stop button functionality is not clear.
 
 public class MainActivity extends AppCompatActivity {
+    private Button settingsBtn;
     private RecyclerView recyclerView;
     private MusicRecyclerViewAdapter adapter;
     private List<TrackData> trackData = new ArrayList<>();
@@ -51,32 +51,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-
-        // Set the selected item (navbar)
-        bottomNavigationView.setSelectedItemId(R.id.nav_home);
-
-        // Set a listener to handle item selection
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(MainActivity.this, MainActivity.class));
-                overridePendingTransition(0, 0); // No animation for smoother switch
-                return true;
-            } else if (itemId == R.id.nav_player) {
-                    startActivity(new Intent(MainActivity.this, PlayerActivity.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-            } else if (itemId == R.id.nav_settings){
-                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-            }
-            return false;
-        });
-
+        settingsBtn = findViewById(R.id.settingsBtn);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        settingsBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+        });
 
         // Set adapter with empty list initially
         adapter = new MusicRecyclerViewAdapter(this, trackData, filePath -> {

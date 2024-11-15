@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -15,9 +16,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 public class PlayerActivity extends AppCompatActivity {
+    private Button homeBtn;
     private Button playButton;
     private Button pauseButton;
     private Button stopButton;
@@ -42,35 +42,17 @@ public class PlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
+        homeBtn = findViewById(R.id.homeBtn);
+        playButton = findViewById(R.id.playButton);
+        pauseButton = findViewById(R.id.pauseButton);
+        stopButton = findViewById(R.id.stopButton);
+        seekBar = findViewById(R.id.seekBar);
+
         // Register positionReceiver to update SeekBar
         LocalBroadcastManager.getInstance(this).registerReceiver(positionReceiver,
                 new IntentFilter("position_update"));
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // Set the selected item (navbar)
-        bottomNavigationView.setSelectedItemId(R.id.nav_player);
-
-        // Set a listener to handle item selection
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(PlayerActivity.this, MainActivity.class));
-                overridePendingTransition(0, 0); // No animation for smoother switch
-                return true;
-            } else if (itemId == R.id.nav_player) {
-                startActivity(new Intent(PlayerActivity.this, PlayerActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.nav_settings){
-                startActivity(new Intent(PlayerActivity.this, SettingsActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            }
-            return false;
-        });
-
-        seekBar = findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -95,10 +77,11 @@ public class PlayerActivity extends AppCompatActivity {
 
         filePath = getIntent().getStringExtra("FILE_PATH");
 
-        playButton = findViewById(R.id.playButton);
-        pauseButton = findViewById(R.id.pauseButton);
-        stopButton = findViewById(R.id.stopButton);
-
+        homeBtn.setOnClickListener(v -> {
+                    Intent intent = new Intent(PlayerActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(0, 0);
+                });
         playButton.setOnClickListener(v -> togglePlay());
         pauseButton.setOnClickListener(v -> togglePause());
         stopButton.setOnClickListener(v -> stopAudioService());
