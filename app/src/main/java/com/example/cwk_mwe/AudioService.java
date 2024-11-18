@@ -59,22 +59,26 @@ public class AudioService extends Service {
         handler.post(updateSeekBarRunnable); // Start runnable for the progress bar
         updateNotification("Playing Audio"); // Update notification
 
-        if (filePath != null && (audiobookPlayer.getFilePath() == null || !filePath.equals(audiobookPlayer.getFilePath()))) {
-            // Case if a new file path is provided
-            playFile(filePath);
-        } else if (filePath == null && audiobookPlayer.getFilePath() == null) {
-            // Load the first track if no file is playing
+        if (audiobookPlayer == null) {
+            audiobookPlayer = new AudiobookPlayer();
+            Log.d("AudioService", "AudiobookPlayer was null, reinitialized.");
+        }
+        if (filePath != null) {
+            // If a file path is provided, play it if it's new or the player was stopped
+            if (!filePath.equals(audiobookPlayer.getFilePath())) {
+                playFile(filePath);
+                // No log because playFile has a log
+            }
+        } else if (audiobookPlayer.getFilePath() == null) {
+            // No file is currently playing, play the first track from the playlist
             if (!playlist.isEmpty()) {
                 playFile(playlist.get(0));
+                Log.d("AudioService", "Playing first track in playlist: " + playlist.get(0));
             } else {
                 Log.e("AudioService", "Playlist is empty. Stopping service.");
                 stopSelf();
                 return START_NOT_STICKY;
             }
-        } else if (audiobookPlayer == null && filePath != null) {
-            // Case if no audiobookPlayer is loaded and a file path is provided
-            // This happens if the player is stopped and then started again, not sure why
-            playFile(filePath);
         }
 
         if (action != null && audiobookPlayer != null) {
@@ -119,37 +123,55 @@ public class AudioService extends Service {
                     skipTrack();
                     break;
             }
+        } else if (audiobookPlayer == null) {
+            Log.e("AudioService.onStartCommand", "AudiobookPlayer is null");
+            checkPlayerState("AudioService.ACTION_ERROR");
         } else {
-            Log.e("AudioService.onStartCommand", "Action or audiobookPlayer is null");
-            checkPlayerState("ACTION_ERROR");
+            Log.d("AudioService.onStartCommand", "Action is null"); // This gets triggered on startup, don't worry, theres just no command on startup lol
+            checkPlayerState("AudioService.ACTION_ERROR");
         }
 
         return START_NOT_STICKY;
     }
 
     private Notification buildNotification(String contentText) {
-        Intent playIntent = new Intent(this, AudioService.class);
-        playIntent.setAction(ACTION_PLAY);
-        PendingIntent playPendingIntent = PendingIntent.getService(this, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        Intent pauseIntent = new Intent(this, AudioService.class);
-        pauseIntent.setAction(ACTION_PAUSE);
-        PendingIntent pausePendingIntent = PendingIntent.getService(this, 1, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        Intent stopIntent = new Intent(this, AudioService.class);
-        stopIntent.setAction(ACTION_STOP);
-        PendingIntent stopPendingIntent = PendingIntent.getService(this, 2, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Galen's MP3 Player")
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_music_notif)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .addAction(R.drawable.ic_play, "Play", playPendingIntent)
-                .addAction(R.drawable.ic_pause, "Pause", pausePendingIntent)
-                .addAction(R.drawable.ic_stop, "Stop", stopPendingIntent)
-                .build();
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        // Check audiobookPlayer state and add appropriate Play/Pause action
+        if (audiobookPlayer != null && audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PLAYING) {
+            Intent pauseIntent = new Intent(this, AudioService.class);
+            pauseIntent.setAction(ACTION_PAUSE);
+            PendingIntent pausePendingIntent = PendingIntent.getService(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+            builder.addAction(R.drawable.ic_pause, "Pause", pausePendingIntent);
+        } else if (audiobookPlayer != null && audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PAUSED) {
+            Intent playIntent = new Intent(this, AudioService.class);
+            playIntent.setAction(ACTION_PLAY);
+            PendingIntent playPendingIntent = PendingIntent.getService(this, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+            builder.addAction(R.drawable.ic_play, "Play", playPendingIntent);
+        } else {
+            checkPlayerState("buildNotification");
+        }
+
+        Intent stopIntent = new Intent(this, AudioService.class);
+        stopIntent.setAction(ACTION_STOP);
+        PendingIntent stopPendingIntent = PendingIntent.getService(this, 1, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        builder.addAction(R.drawable.ic_stop, "Stop", stopPendingIntent);
+
+        Intent skipIntent = new Intent(this, AudioService.class);
+        skipIntent.setAction(ACTION_SKIP);
+        PendingIntent skipPendingIntent = PendingIntent.getService(this, 2, skipIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        builder.addAction(R.drawable.ic_skip, "Skip", skipPendingIntent);
+
+        return builder.build();
     }
+
+
 
     private void updateNotification(String contentText) {
         Notification notification = buildNotification(contentText);
@@ -204,6 +226,7 @@ public class AudioService extends Service {
         audiobookPlayer.stop();
         audiobookPlayer.load(filePath, 1.0f);
         audiobookPlayer.play();
+        updateNotification("Playing Audio");
         Log.d("AudioService", "Playing file: " + filePath);
     }
 

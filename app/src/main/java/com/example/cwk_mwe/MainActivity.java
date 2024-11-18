@@ -31,8 +31,9 @@ import java.util.List;
 // - Add Color Changer
 // - Add Playback speed settings
 // - Test with "don't keep activities on"
-// - add skip to notification
 // - notification returns the user to the app
+// - Stop button isn't removing the notification (possible issue with service not being closed properly?)
+// - skip button just plays the second track, not the next track
 
 /**
  * This is the main activity, the home page. It displays the list of audio files in the Music directory.
