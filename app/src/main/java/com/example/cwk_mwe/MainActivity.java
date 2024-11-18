@@ -22,8 +22,6 @@ import android.os.Environment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +31,6 @@ import java.util.List;
 // - Add Playback speed settings
 // - Bookmarks feature
 // - Skip Track feature
-// - Stop button does not nullify isPlaying it seems
 // - is isplaying even necessary?
 // - Make the seekbar something you can't interact with
 // - Stop button functionality is not clear.
@@ -43,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MusicRecyclerViewAdapter adapter;
     private List<TrackData> trackData = new ArrayList<>();
-    private AudiobookPlayer audiobookPlayer;
     private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO_AND_NOTIFICATIONS = 100;
 
     @Override
@@ -76,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        audiobookPlayer = new AudiobookPlayer();
         checkAndRequestPermissions();
     }
 
