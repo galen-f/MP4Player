@@ -135,10 +135,17 @@ public class AudioService extends Service {
     }
 
     private Notification buildNotification(String contentText) {
+        // Intent to open the main activity when notification is clicked
+        Intent notificationIntent = new Intent(this, PlayerActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Galen's MP3 Player")
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_music_notif)
+                .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
         // Check audiobookPlayer state and add appropriate Play/Pause action

@@ -32,7 +32,8 @@ import java.util.List;
 // - Add Playback speed settings
 // - Test with "don't keep activities on"
 // - notification returns the user to the app
-// - Stop button isn't removing the notification (possible issue with service not being closed properly?)
+// - Stop button isn't removing the notification when stopped while on the activity (possible issue with service not being closed properly?)
+// - reverse stack navigation ends service lifecycle
 
 /**
  * This is the main activity, the home page. It displays the list of audio files in the Music directory.
