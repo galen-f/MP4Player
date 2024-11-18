@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,9 +22,8 @@ public class PlayerActivity extends AppCompatActivity {
     private Button stopButton;
     private SeekBar seekBar;
     private boolean isPlaying = false;
+    private boolean isStopped = false;
     private String filePath;
-    private MediaPlayer startmusic;
-    private Handler handler = new Handler();
     private BroadcastReceiver positionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -59,7 +57,7 @@ public class PlayerActivity extends AppCompatActivity {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
-                if (fromTouch && startmusic != null && isPlaying) {
+                if (fromTouch && isPlaying) {
                     Intent intent = new Intent(PlayerActivity.this, AudioService.class);
                     intent.setAction(AudioService.ACTION_SEEK);
                     intent.putExtra("seek_position", progress);
@@ -101,7 +99,9 @@ public class PlayerActivity extends AppCompatActivity {
     private void togglePlay() {
         if (filePath != null) {
             Intent intent = new Intent(this, AudioService.class);
-            if (!isPlaying) {
+            if (isStopped) {
+                Toast.makeText(this, "Audio has been stopped, please load new track", Toast.LENGTH_SHORT).show();
+            } else if (!isPlaying && !isStopped) {
                 intent.putExtra("FILE_PATH", filePath);
                 intent.setAction(AudioService.ACTION_PLAY);
                 startService(intent);
@@ -109,15 +109,17 @@ public class PlayerActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Audio is already playing", Toast.LENGTH_SHORT).show();
             }
-//            startService(intent);
-//            isPlaying = !isPlaying;
+        } else {
+            Toast.makeText(this, "No file path selected", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void togglePause() {
         if (filePath != null) {
             Intent intent = new Intent(this, AudioService.class);
-            if (isPlaying) {
+            if (isStopped) {
+                Toast.makeText(this, "Audio has been stopped, please load new track", Toast.LENGTH_SHORT).show();
+            } else if (isPlaying && !isStopped) {
                 intent.setAction(AudioService.ACTION_PAUSE);
                 //Log.d("PlayerActivity", "Pause command sent");
                 isPlaying = false;
@@ -125,7 +127,8 @@ public class PlayerActivity extends AppCompatActivity {
                 Toast.makeText(this, "Audio is already paused", Toast.LENGTH_SHORT).show();
             }
             startService(intent);
-//            isPlaying = !isPlaying;
+        } else {
+            Toast.makeText(this, "No file path selected", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -133,7 +136,7 @@ public class PlayerActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AudioService.class);
         intent.setAction(AudioService.ACTION_STOP);
         startService(intent);
-        isPlaying = false;
+        isStopped = true;
     }
 
     @Override
