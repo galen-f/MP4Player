@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +25,7 @@ public class PlayerActivity extends AppCompatActivity {
     private boolean isPlaying = false;
     private boolean isStopped = false;
     private String filePath;
+//    private Handler handler = new Handler();
     private BroadcastReceiver positionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -50,29 +52,6 @@ public class PlayerActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(positionReceiver,
                 new IntentFilter("position_update"));
 
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
-                if (fromTouch && isPlaying) {
-                    Intent intent = new Intent(PlayerActivity.this, AudioService.class);
-                    intent.setAction(AudioService.ACTION_SEEK);
-                    intent.putExtra("seek_position", progress);
-                    startService(intent);
-                    //Log.d("PlayerActivity", "Seekbar progress (inside loop): " + progress);
-                }
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(positionReceiver,
-                new IntentFilter("position_update"));
-
         filePath = getIntent().getStringExtra("FILE_PATH");
 
         homeBtn.setOnClickListener(v -> {
@@ -90,7 +69,7 @@ public class PlayerActivity extends AppCompatActivity {
             intent.putExtra("FILE_PATH", filePath);
             //intent.setAction(AudioService.ACTION_PLAY);
             startService(intent);
-            isPlaying = true; // Set isPlaying to true since we're starting playback
+            isPlaying = true;
         } else {
             Toast.makeText(this, "Error: No file selected", Toast.LENGTH_SHORT).show();
         }

@@ -40,6 +40,8 @@ public class AudioService extends Service {
         String action = intent.getAction();
         String filePath = intent.getStringExtra("FILE_PATH");
 
+        handler.post(updateSeekBarRunnable); // Start runnable for the progress bar
+
         if (filePath != null && (audiobookPlayer.getFilePath() == null || !filePath.equals(audiobookPlayer.getFilePath()))) {
             // Case if a new file path is provided
             audiobookPlayer.stop();
@@ -65,6 +67,8 @@ public class AudioService extends Service {
                         audiobookPlayer.play();
                         updateNotification("Playing Audio");
                         checkPlayerState("ACTION_PLAY");
+
+
                     } else {
                         Log.d("AudioService", "(play command ignored)");
                         checkPlayerState("ACTION_PLAY");
@@ -86,7 +90,7 @@ public class AudioService extends Service {
                 case ACTION_STOP:
                     audiobookPlayer.stop();
                     stopForeground(true);
-                    //audiobookPlayer = null; // Release Player instance
+                    handler.removeCallbacks(updateSeekBarRunnable);
                     checkPlayerState("ACTION_STOP");
                     break;
 
