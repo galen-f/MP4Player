@@ -80,6 +80,10 @@ public class PlayerActivity extends AppCompatActivity {
         if (startTimestamp > 0) {
             seekToTimestamp(startTimestamp);
         }
+
+        // Register the receiver for player state updates in case the service is stopped from notification
+        LocalBroadcastManager.getInstance(this).registerReceiver(playerStateReceiver,
+                new IntentFilter("player_state_update"));
     }
 
     private void audioPlay() {
@@ -124,6 +128,8 @@ public class PlayerActivity extends AppCompatActivity {
             intent.setAction(AudioService.ACTION_SKIP);
             startService(intent);
             isPlaying = true;
+
+            // Unstop audio if it was stopped
             isStopped = false;
             Toast.makeText(this, "Skipped to next track", Toast.LENGTH_SHORT).show();
         } else {
@@ -132,10 +138,14 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void stopAudioService() {
-        Intent intent = new Intent(this, AudioService.class);
-        intent.setAction(AudioService.ACTION_STOP);
-        startService(intent);
+        Intent stopIntent = new Intent(this, AudioService.class);
+        stopIntent.setAction(AudioService.ACTION_STOP);
+        startService(stopIntent);
         isStopped = true;
+
+        Intent mainActivityIntent = new Intent(this, MainActivity.class);
+        startActivity(mainActivityIntent);
+        finish();
     }
 
     private void addBookmark() {
@@ -158,9 +168,25 @@ public class PlayerActivity extends AppCompatActivity {
         startService(intent);
     }
 
+    private BroadcastReceiver playerStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String state = intent.getStringExtra("state");
+            if ("stopped".equals(state)) {
+                // Close the activity and navigate back to MainActivity
+                Toast.makeText(PlayerActivity.this, "Playback stopped, returned to home screen!", Toast.LENGTH_SHORT).show();
+                Intent mainActivityIntent = new Intent(PlayerActivity.this, MainActivity.class);
+                startActivity(mainActivityIntent);
+                finish();
+            }
+        }
+    };
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         stopAudioService();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(positionReceiver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(playerStateReceiver);
     }
 }

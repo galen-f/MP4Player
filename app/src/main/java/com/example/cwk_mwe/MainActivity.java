@@ -31,8 +31,6 @@ import java.util.List;
 // - Add Color Changer
 // - Add Playback speed settings
 // - Test with "don't keep activities on"
-// - notification returns the user to the app
-// - Stop button isn't removing the notification when stopped while on the activity (possible issue with service not being closed properly?)
 // - reverse stack navigation ends service lifecycle
 
 /**

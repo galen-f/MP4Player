@@ -89,7 +89,7 @@ public class AudioService extends Service {
                         updateNotification("Playing Audio");
                         checkPlayerState("ACTION_PLAY");
                     } else {
-                        Log.d("AudioService", "(play command ignored)");
+                        Log.w("AudioService", "(play command ignored)");
                         checkPlayerState("ACTION_PLAY");
                     }
                     break;
@@ -97,20 +97,20 @@ public class AudioService extends Service {
                 case ACTION_PAUSE:
                     if (audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PLAYING) {
                         audiobookPlayer.pause();
-                        stopForeground(false);
                         updateNotification("Paused Audio");
                         checkPlayerState("ACTION_PAUSE");
                     } else {
-                        Log.d("AudioService", "(pause command ignored)");
+                        Log.w("AudioService", "(pause command ignored)");
                         checkPlayerState("ACTION_PAUSE");
                     }
                     break;
 
                 case ACTION_STOP:
                     audiobookPlayer.stop();
-                    stopForeground(true);
-                    handler.removeCallbacks(updateSeekBarRunnable);
                     checkPlayerState("ACTION_STOP");
+                    stopForeground(true);
+                    broadcastStoppedState(); // here in case the service is stopped from notification - notify the activity
+                    stopSelf();
                     break;
 
                 case ACTION_SEEK:
@@ -255,6 +255,12 @@ public class AudioService extends Service {
         } else {
             Log.e("AudioService", "Cannot skip, playlist is empty.");
         }
+    }
+
+    private void broadcastStoppedState() {
+        Intent intent = new Intent("player_state_update");
+        intent.putExtra("state", "stopped");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public void checkPlayerState(String location){
