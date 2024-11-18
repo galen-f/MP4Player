@@ -30,10 +30,10 @@ import java.util.List;
 // - Add Color Changer
 // - Add Playback speed settings
 // - Bookmarks feature
+// - Auto create "queue"
 // - Skip Track feature
-// - is isplaying even necessary?
-// - Make the seekbar something you can't interact with
-// - Stop button functionality is not clear.
+// - Make the seekbar something you can't interact with (ask Alex about this)
+// - Stop button functionality is not clear. (ask Alex about this)
 
 public class MainActivity extends AppCompatActivity {
     private Button settingsBtn;
