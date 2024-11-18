@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -18,6 +17,7 @@ public class PlayerActivity extends AppCompatActivity {
     private Button playButton;
     private Button pauseButton;
     private Button stopButton;
+    private Button skipButton;
     private SeekBar seekBar;
     private boolean isPlaying = false;
     private boolean isStopped = false;
@@ -42,6 +42,7 @@ public class PlayerActivity extends AppCompatActivity {
         playButton = findViewById(R.id.playButton);
         pauseButton = findViewById(R.id.pauseButton);
         stopButton = findViewById(R.id.stopButton);
+        skipButton = findViewById(R.id.skipButton);
         seekBar = findViewById(R.id.seekBar);
 
         // Register positionReceiver to update SeekBar
@@ -55,9 +56,10 @@ public class PlayerActivity extends AppCompatActivity {
                     startActivity(intent);
                     overridePendingTransition(0, 0);
                 });
-        playButton.setOnClickListener(v -> togglePlay());
-        pauseButton.setOnClickListener(v -> togglePause());
+        playButton.setOnClickListener(v -> audioPlay());
+        pauseButton.setOnClickListener(v -> audioPause());
         stopButton.setOnClickListener(v -> stopAudioService());
+        skipButton.setOnClickListener(v -> audioSkip());
 
         // Start the service on creation if a file path is provided
         if (filePath != null) {
@@ -71,7 +73,7 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
-    private void togglePlay() {
+    private void audioPlay() {
         if (filePath != null) {
             Intent intent = new Intent(this, AudioService.class);
             if (isStopped) {
@@ -89,7 +91,7 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
-    private void togglePause() {
+    private void audioPause() {
         if (filePath != null) {
             Intent intent = new Intent(this, AudioService.class);
             if (isStopped) {
@@ -102,6 +104,19 @@ public class PlayerActivity extends AppCompatActivity {
                 Toast.makeText(this, "Audio is already paused", Toast.LENGTH_SHORT).show();
             }
             startService(intent);
+        } else {
+            Toast.makeText(this, "No file path selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void audioSkip() {
+        if (filePath != null) {
+            Intent intent = new Intent(this, AudioService.class);
+            intent.setAction(AudioService.ACTION_SKIP);
+            startService(intent);
+            isPlaying = true;
+            isStopped = false;
+            Toast.makeText(this, "Skipped to next track", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "No file path selected", Toast.LENGTH_SHORT).show();
         }

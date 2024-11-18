@@ -30,8 +30,6 @@ import java.util.List;
 // - Add Color Changer
 // - Add Playback speed settings
 // - Bookmarks feature
-// - Auto create "queue"
-// - Skip Track feature
 
 public class MainActivity extends AppCompatActivity {
     private Button settingsBtn;

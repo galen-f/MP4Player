@@ -15,14 +15,26 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AudioService extends Service {
+
+    // Action Variables
     public static final String ACTION_PLAY = "com.example.cwk_mwe.ACTION_PLAY";
     public static final String ACTION_PAUSE = "com.example.cwk_mwe.ACTION_PAUSE";
     public static final String ACTION_STOP = "com.example.cwk_mwe.ACTION_STOP";
     public static final String ACTION_SEEK = "com.example.cwk_mwe.ACTION_SEEK";
+    public static final String ACTION_SKIP = "com.example.cwk_mwe.ACTION_SKIP";
+
+    // Service Variables
     public static final String CHANNEL_ID = "AudioServiceChannel";
     private AudiobookPlayer audiobookPlayer;
     private Handler handler = new Handler();
+
+    // Playlist variables
+    private List<String> playlist = new ArrayList<>();
+    private int currentTrackIndex = 0;
 
     @Override
     public void onCreate() {
@@ -40,25 +52,29 @@ public class AudioService extends Service {
         String action = intent.getAction();
         String filePath = intent.getStringExtra("FILE_PATH");
 
+        if (playlist == null || playlist.isEmpty()) {
+            playlist = FileUtils.getAudioFiles(); // Load the "playlist"
+        }
+
         handler.post(updateSeekBarRunnable); // Start runnable for the progress bar
         updateNotification("Playing Audio"); // Update notification
 
         if (filePath != null && (audiobookPlayer.getFilePath() == null || !filePath.equals(audiobookPlayer.getFilePath()))) {
             // Case if a new file path is provided
-            audiobookPlayer.stop();
-            audiobookPlayer.load(filePath, 1.0f); // Load new track with normal playback speed
-            Log.d("AudioService", "Audio Service loaded file path: " + filePath);
+            playFile(filePath);
         } else if (filePath == null && audiobookPlayer.getFilePath() == null) {
-            // Case if no file path is provided and no audiobookPlayer is loaded
-            Log.e("AudioService", "No file path provided, and audiobookPlayer is not loaded with a file.");
-            stopSelf();
-            return START_NOT_STICKY;
+            // Load the first track if no file is playing
+            if (!playlist.isEmpty()) {
+                playFile(playlist.get(0));
+            } else {
+                Log.e("AudioService", "Playlist is empty. Stopping service.");
+                stopSelf();
+                return START_NOT_STICKY;
+            }
         } else if (audiobookPlayer == null && filePath != null) {
             // Case if no audiobookPlayer is loaded and a file path is provided
             // This happens if the player is stopped and then started again, not sure why
-            audiobookPlayer = new AudiobookPlayer();
-            audiobookPlayer.load(filePath, 1.0f);
-            Log.d("AudioService", "Audio Service loaded file path: " + filePath);
+            playFile(filePath);
         }
 
         if (action != null && audiobookPlayer != null) {
@@ -68,8 +84,6 @@ public class AudioService extends Service {
                         audiobookPlayer.play();
                         updateNotification("Playing Audio");
                         checkPlayerState("ACTION_PLAY");
-
-
                     } else {
                         Log.d("AudioService", "(play command ignored)");
                         checkPlayerState("ACTION_PLAY");
@@ -101,6 +115,9 @@ public class AudioService extends Service {
                     audiobookPlayer.skipTo(seekPosition);
                     break;
 
+                case ACTION_SKIP:
+                    skipTrack();
+                    break;
             }
         } else {
             Log.e("AudioService.onStartCommand", "Action or audiobookPlayer is null");
@@ -181,6 +198,22 @@ public class AudioService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    private void playFile(String filePath) {
+        audiobookPlayer.stop();
+        audiobookPlayer.load(filePath, 1.0f);
+        audiobookPlayer.play();
+        Log.d("AudioService", "Playing file: " + filePath);
+    }
+
+    private void skipTrack() {
+        if (playlist != null && !playlist.isEmpty()) {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.size();
+            playFile(playlist.get(currentTrackIndex));
+        } else {
+            Log.e("AudioService", "Cannot skip, playlist is empty.");
+        }
     }
 
     public void checkPlayerState(String location){
