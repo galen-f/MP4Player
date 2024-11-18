@@ -14,6 +14,13 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Utility class providing methods for managing bookmarks including saving and loading bookmarks
+ * from a local JSON file, bookmarks.JSON, found in
+ * /data/data/com.example.cwk_mwe/files/bookmarks.json
+ * This file is in the apps internal storage and should be private to the app.
+ */
 public class BookmarkManager {
     private static final String BOOKMARKS_FILE = "bookmarks.json";
 

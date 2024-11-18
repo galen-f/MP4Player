@@ -10,6 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+/**
+ * RecyclerView adapter for displaying bookmarks.
+ * This spawns the modal on the MainActivity to display bookmarks.
+ */
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder> {
     private final List<BookmarkData> bookmarks;
     private final OnBookmarkClickListener listener;

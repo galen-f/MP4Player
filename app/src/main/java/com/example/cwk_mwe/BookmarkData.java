@@ -1,5 +1,9 @@
 package com.example.cwk_mwe;
 
+
+/**
+ * Data class representing a bookmark.
+ */
 public class BookmarkData {
     private String audiobookPath;
     private long timestamp;

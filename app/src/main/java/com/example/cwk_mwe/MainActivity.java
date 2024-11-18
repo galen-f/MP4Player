@@ -31,6 +31,14 @@ import java.util.List;
 // - Add Color Changer
 // - Add Playback speed settings
 // - Test with "don't keep activities on"
+// - add skip to notification
+// - notification returns the user to the app
+
+/**
+ * This is the main activity, the home page. It displays the list of audio files in the Music directory.
+ * It also allows for a modal to be created when clicking the bookmark button to allow the user to
+ * direct themselves to a specific bookmark in a specific audio file.
+ */
 
 public class MainActivity extends AppCompatActivity {
     private Button settingsBtn, bookmarksBtn;
@@ -148,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             File[] files = musicDir.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    if (file.isFile() && file.getName().endsWith(".mp3")) { // Ignore if not an audio file
+                    if (file.isFile() && file.getName().endsWith(".mp3")) { // Ignore if not an mp3 file
                         trackData.add(new TrackData(file.getName(), file.getAbsolutePath()));
                     }
                 }
@@ -168,13 +176,12 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // Create a RecyclerView for bookmarks
+            // Create a RecyclerView for bookmarks (modal)
             RecyclerView recyclerView = new RecyclerView(this);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-            // Set up adapter for bookmarks
             BookmarkAdapter adapter = new BookmarkAdapter(bookmarks, bookmark -> {
-                // On bookmark click, start PlayerActivity
+                // On bookmark click, start the player
                 Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
                 intent.putExtra("FILE_PATH", bookmark.getAudiobookPath());
                 intent.putExtra("TIMESTAMP", bookmark.getTimestamp());
@@ -182,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
             });
             recyclerView.setAdapter(adapter);
 
-            // Show bookmarks in a dialog
+            // Show bookmarks in a modal
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Bookmarks")
                     .setView(recyclerView)
