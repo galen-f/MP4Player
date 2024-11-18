@@ -31,7 +31,7 @@ public class AudioService extends Service {
         audiobookPlayer = new AudiobookPlayer();
         Log.d("AudioService.onCreate", "AudiobookPlayer created");
 
-        startForeground(1, buildNotification("Ready to Play!"));
+        startForeground(1, buildNotification("Ready to play!"));
         checkPlayerState("AudioService.onCreate");
     }
 
@@ -41,6 +41,7 @@ public class AudioService extends Service {
         String filePath = intent.getStringExtra("FILE_PATH");
 
         handler.post(updateSeekBarRunnable); // Start runnable for the progress bar
+        updateNotification("Playing Audio"); // Update notification
 
         if (filePath != null && (audiobookPlayer.getFilePath() == null || !filePath.equals(audiobookPlayer.getFilePath()))) {
             // Case if a new file path is provided
@@ -175,16 +176,6 @@ public class AudioService extends Service {
             }
         }
     };
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (audiobookPlayer != null) {
-            audiobookPlayer.stop();
-            audiobookPlayer = null;
-            Log.d("AudioService.onDestroy", "Audio service destroyed");
-        }
-    }
 
     @Nullable
     @Override
