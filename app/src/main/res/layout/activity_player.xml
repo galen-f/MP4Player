@@ -9,7 +9,7 @@
 
     <!-- Play/Pause Button -->
     <Button
-        android:id="@+id/playButton"
+        android:id="@+id/playBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -19,39 +19,39 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/pauseButton"
+        android:id="@+id/pauseBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Pause"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/playButton" />
+        app:layout_constraintTop_toBottomOf="@id/playBtn" />
 
     <!-- Stop Button -->
     <Button
-        android:id="@+id/stopButton"
+        android:id="@+id/stopBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Stop"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pauseButton" />
+        app:layout_constraintTop_toBottomOf="@id/pauseBtn" />
 
     <!-- Skip Button -->
     <Button
-        android:id="@+id/skipButton"
+        android:id="@+id/skipBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Skip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/stopButton" />
+        app:layout_constraintTop_toBottomOf="@id/stopBtn" />
 
     <Button
-        android:id="@+id/bookmarkButton"
+        android:id="@+id/bookmarkBtn"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="50dp"
@@ -68,7 +68,7 @@
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/skipButton" />
+        app:layout_constraintTop_toBottomOf="@id/skipBtn" />
 
     <!-- Home Button -->
     <Button

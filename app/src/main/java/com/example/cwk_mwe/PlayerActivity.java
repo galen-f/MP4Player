@@ -12,17 +12,15 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.io.File;
+
 public class PlayerActivity extends AppCompatActivity {
-    private Button homeBtn;
-    private Button playButton;
-    private Button pauseButton;
-    private Button stopButton;
-    private Button skipButton;
+    private Button homeBtn, playBtn, pauseBtn, stopBtn, skipBtn, bookmarkBtn;
     private SeekBar seekBar;
-    private boolean isPlaying = false;
-    private boolean isStopped = false;
-    private String filePath;
+    private boolean isPlaying = false, isStopped = false;
+    private String filePath, title;
     private BroadcastReceiver positionReceiver = new BroadcastReceiver() {
+
         @Override
         public void onReceive(Context context, Intent intent) {
             int currentPosition = intent.getIntExtra("current_position", 0);
@@ -39,10 +37,12 @@ public class PlayerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_player);
 
         homeBtn = findViewById(R.id.homeBtn);
-        playButton = findViewById(R.id.playButton);
-        pauseButton = findViewById(R.id.pauseButton);
-        stopButton = findViewById(R.id.stopButton);
-        skipButton = findViewById(R.id.skipButton);
+        playBtn = findViewById(R.id.playBtn);
+        pauseBtn = findViewById(R.id.pauseBtn);
+        stopBtn = findViewById(R.id.stopBtn);
+        skipBtn = findViewById(R.id.skipBtn);
+        bookmarkBtn = findViewById(R.id.bookmarkBtn);
+
         seekBar = findViewById(R.id.seekBar);
 
         // Register positionReceiver to update SeekBar
@@ -50,16 +50,18 @@ public class PlayerActivity extends AppCompatActivity {
                 new IntentFilter("position_update"));
 
         filePath = getIntent().getStringExtra("FILE_PATH");
+        title = filePath != null ? new File(filePath).getName() : "Unknown";
 
         homeBtn.setOnClickListener(v -> {
                     Intent intent = new Intent(PlayerActivity.this, MainActivity.class);
                     startActivity(intent);
                     overridePendingTransition(0, 0);
                 });
-        playButton.setOnClickListener(v -> audioPlay());
-        pauseButton.setOnClickListener(v -> audioPause());
-        stopButton.setOnClickListener(v -> stopAudioService());
-        skipButton.setOnClickListener(v -> audioSkip());
+        playBtn.setOnClickListener(v -> audioPlay());
+        pauseBtn.setOnClickListener(v -> audioPause());
+        stopBtn.setOnClickListener(v -> stopAudioService());
+        skipBtn.setOnClickListener(v -> audioSkip());
+        bookmarkBtn.setOnClickListener(v -> addBookmark());
 
         // Start the service on creation if a file path is provided
         if (filePath != null) {
@@ -127,6 +129,18 @@ public class PlayerActivity extends AppCompatActivity {
         intent.setAction(AudioService.ACTION_STOP);
         startService(intent);
         isStopped = true;
+    }
+
+    private void addBookmark() {
+        int currentPosition = seekBar.getProgress();
+        BookmarkData bookmark = new BookmarkData(filePath, currentPosition, title);
+
+        boolean success = BookmarkManager.addBookmark(this, bookmark);
+        if (success) {
+            Toast.makeText(this, "Bookmark added successfully", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Failed to add bookmark", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
