@@ -36,6 +36,8 @@ public class PlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
+        long startTimestamp = getIntent().getLongExtra("TIMESTAMP", 0);
+
         homeBtn = findViewById(R.id.homeBtn);
         playBtn = findViewById(R.id.playBtn);
         pauseBtn = findViewById(R.id.pauseBtn);
@@ -72,6 +74,11 @@ public class PlayerActivity extends AppCompatActivity {
             isPlaying = true;
         } else {
             Toast.makeText(this, "Error: No file selected", Toast.LENGTH_SHORT).show();
+        }
+
+        // If the timestamp is provided (bookmark), seek to that position
+        if (startTimestamp > 0) {
+            seekToTimestamp(startTimestamp);
         }
     }
 
@@ -141,6 +148,14 @@ public class PlayerActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Failed to add bookmark", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void seekToTimestamp(long timestamp) {
+        // Seek to the provided timestamp after loading the file (bookmarks)
+        Intent intent = new Intent(this, AudioService.class);
+        intent.setAction(AudioService.ACTION_SEEK);
+        intent.putExtra("seek_position", (int) timestamp);
+        startService(intent);
     }
 
     @Override

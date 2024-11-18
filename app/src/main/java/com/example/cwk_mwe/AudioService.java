@@ -111,7 +111,7 @@ public class AudioService extends Service {
 
                 case ACTION_SEEK:
                     int seekPosition = intent.getIntExtra("seek_position", 0);
-                    Log.d("AudioService", "Seek Command Received" + seekPosition);
+                    Log.d("AudioService", "Seek Command Received, seeking to: " + seekPosition);
                     audiobookPlayer.skipTo(seekPosition);
                     break;
 

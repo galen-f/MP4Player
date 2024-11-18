@@ -23,16 +23,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 //TODO:
 // - Add Color Changer
 // - Add Playback speed settings
-// - Bookmarks feature
+// - Test with "don't keep activities on"
 
 public class MainActivity extends AppCompatActivity {
-    private Button settingsBtn;
+    private Button settingsBtn, bookmarksBtn;
     private RecyclerView recyclerView;
     private MusicRecyclerViewAdapter adapter;
     private List<TrackData> trackData = new ArrayList<>();
@@ -44,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         settingsBtn = findViewById(R.id.settingsBtn);
+        bookmarksBtn = findViewById(R.id.bookmarksBtn);
         recyclerView = findViewById(R.id.recyclerView);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         settingsBtn.setOnClickListener(v -> {
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             overridePendingTransition(0, 0);
         });
+        bookmarksBtn.setOnClickListener(v -> displayBookmarks());
 
         // Set adapter with empty list initially
         adapter = new MusicRecyclerViewAdapter(this, trackData, filePath -> {
@@ -153,6 +157,42 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             Toast.makeText(this, "No Music Directory Found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void displayBookmarks() {
+        try {
+            List<BookmarkData> bookmarks = BookmarkManager.loadBookmarks(this);
+            if (bookmarks.isEmpty()) {
+                Toast.makeText(this, "No bookmarks available", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Create a RecyclerView for bookmarks
+            RecyclerView recyclerView = new RecyclerView(this);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+            // Set up adapter for bookmarks
+            BookmarkAdapter adapter = new BookmarkAdapter(bookmarks, bookmark -> {
+                // On bookmark click, start PlayerActivity
+                Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+                intent.putExtra("FILE_PATH", bookmark.getAudiobookPath());
+                intent.putExtra("TIMESTAMP", bookmark.getTimestamp());
+                startActivity(intent);
+            });
+            recyclerView.setAdapter(adapter);
+
+            // Show bookmarks in a dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Bookmarks")
+                    .setView(recyclerView)
+                    .setNegativeButton("Close", (dialog, which) -> dialog.dismiss())
+                    .create()
+                    .show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error loading bookmarks", Toast.LENGTH_SHORT).show();
         }
     }
 }
