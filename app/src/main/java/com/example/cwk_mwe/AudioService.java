@@ -232,14 +232,26 @@ public class AudioService extends Service {
 
     private void skipTrack() {
         if (playlist != null && !playlist.isEmpty()) {
-            currentTrackIndex = (currentTrackIndex + 1) % playlist.size();
-            playFile(playlist.get(currentTrackIndex));
+            // Variables to find the location in the "playlist"
+            String currentFilePath = audiobookPlayer.getFilePath();
+            int currentIndex = playlist.indexOf(currentFilePath);
+
+            if (currentIndex != -1) {
+                // Play the next track in the playlist, wrap around playlist if at end
+                currentTrackIndex = (currentIndex + 1) % playlist.size();
+                playFile(playlist.get(currentTrackIndex));
+            } else {
+                Log.w("AudioService", "Current file not found in playlist, playing first track...");
+                currentTrackIndex = 0;
+                playFile(playlist.get(currentTrackIndex));
+            }
         } else {
             Log.e("AudioService", "Cannot skip, playlist is empty.");
         }
     }
 
     public void checkPlayerState(String location){
+        // This method exists for bug fixing
         if (audiobookPlayer == null) {
             Log.d(location, "Player state is null");
         } else {

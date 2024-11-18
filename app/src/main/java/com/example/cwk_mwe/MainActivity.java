@@ -33,7 +33,6 @@ import java.util.List;
 // - Test with "don't keep activities on"
 // - notification returns the user to the app
 // - Stop button isn't removing the notification (possible issue with service not being closed properly?)
-// - skip button just plays the second track, not the next track
 
 /**
  * This is the main activity, the home page. It displays the list of audio files in the Music directory.
