@@ -4,11 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -25,7 +22,6 @@ public class PlayerActivity extends AppCompatActivity {
     private boolean isPlaying = false;
     private boolean isStopped = false;
     private String filePath;
-//    private Handler handler = new Handler();
     private BroadcastReceiver positionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

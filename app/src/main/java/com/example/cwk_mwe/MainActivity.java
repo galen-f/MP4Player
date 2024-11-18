@@ -32,8 +32,6 @@ import java.util.List;
 // - Bookmarks feature
 // - Auto create "queue"
 // - Skip Track feature
-// - Make the seekbar something you can't interact with (ask Alex about this)
-// - Stop button functionality is not clear. (ask Alex about this)
 
 public class MainActivity extends AppCompatActivity {
     private Button settingsBtn;
