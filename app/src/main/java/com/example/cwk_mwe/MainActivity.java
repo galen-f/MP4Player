@@ -37,8 +37,6 @@ import java.util.List;
 // - denied permissions in ungraceful
 // - Data Binding library? *
 // - What happens after a song plays?
-// - Play song on activity load *
-
 
 /**
  * This is the main activity, the home page. It displays the list of audio files in the Music directory.

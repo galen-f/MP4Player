@@ -21,6 +21,7 @@ public class PlayerActivity extends AppCompatActivity {
         // Initialize ViewModel
         playerViewModel = new ViewModelProvider(this).get(PlayerViewModel.class);
 
+
         // UI Components Initialization
         findViewById(R.id.homeBtn).setOnClickListener(v -> navigateToHome());
         findViewById(R.id.playBtn).setOnClickListener(v -> playAudio());
@@ -40,6 +41,9 @@ public class PlayerActivity extends AppCompatActivity {
                 navigateToHome();
             }
         });
+
+        // Play Audio as soon as the activity is created
+        playAudio();
     }
 
     private void playAudio() {
