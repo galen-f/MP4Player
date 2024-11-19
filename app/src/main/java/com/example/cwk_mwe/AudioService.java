@@ -271,4 +271,13 @@ public class AudioService extends Service {
             Log.d(location, "Player state: " + audiobookPlayer.getState());
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Remove callbacks to prevent memory leaks
+        handler.removeCallbacks(updateSeekBarRunnable);
+        audiobookPlayer.stop(); // Stop and release resources in AudiobookPlayer
+        Log.d("AudioService", "Service destroyed");
+    }
 }

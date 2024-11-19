@@ -34,8 +34,6 @@ import java.util.List;
 //TODO:
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
 // - Empty playlist edge case in AudioService (Test)
-// - Need to avoid duplicate activities when navigating between activities with backstack
-// - Potential for memory leaks in the updateSeekBarRunnable
 // - denied permissions in ungraceful
 // - Data Binding library? *
 // - What happens after a song plays?
