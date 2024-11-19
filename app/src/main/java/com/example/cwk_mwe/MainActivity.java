@@ -27,21 +27,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO:
-// - Add Color Changer
-// - Add Playback speed settings
-// - Test with "don't keep activities on"
+// - Add Color Changer *
+// - Add Playback speed settings *
+// - Test with "don't keep activities on" *
 // - reverse stack navigation ends service lifecycle
 
 //TODO:
-// - PlayerActivity to ViewModel class
-// - Seekbar update through LiveData?
-// - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications
+// - PlayerActivity to ViewModel class *
+// - Implement LiveData *
+// - Seekbar update through LiveData? *
+// - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
 // - PlayerActivity isStopped and isPlaying states are inconsistent
 // - Empty playlist edge case in AudioService (Test)
 // - Better tie between notification state checks and actual state checks
 // - Need to avoid duplicate activities when navigating between activities with backstack
 // - Potential for memory leaks in the updateSeekBarRunnable
 // - denied permissions in ungraceful
+// - Utilize string constants *
+// - Data Binding library? *
+
 
 /**
  * This is the main activity, the home page. It displays the list of audio files in the Music directory.
