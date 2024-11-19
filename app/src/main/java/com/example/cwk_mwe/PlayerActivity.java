@@ -6,7 +6,10 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.example.cwk_mwe.databinding.ActivityPlayerBinding;
 
 public class PlayerActivity extends AppCompatActivity {
 
@@ -18,23 +21,14 @@ public class PlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
+        ActivityPlayerBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_player);
+
         // Initialize ViewModel
         playerViewModel = new ViewModelProvider(this).get(PlayerViewModel.class);
+        binding.setViewModel(playerViewModel);
+        binding.setLifecycleOwner(this);
 
-
-        // UI Components Initialization
-        findViewById(R.id.homeBtn).setOnClickListener(v -> navigateToHome());
-        findViewById(R.id.playBtn).setOnClickListener(v -> playAudio());
-        findViewById(R.id.pauseBtn).setOnClickListener(v -> pauseAudio());
-        findViewById(R.id.stopBtn).setOnClickListener(v -> stopAudio());
-        findViewById(R.id.skipBtn).setOnClickListener(v -> skipAudio());
-        findViewById(R.id.bookmarkBtn).setOnClickListener(v -> addBookmark());
-
-        seekBar = findViewById(R.id.seekBar);
-
-        // Observe LiveData from PlayerViewModel
-        playerViewModel.getCurrentPosition().observe(this, position -> seekBar.setProgress(position));
-        playerViewModel.getDuration().observe(this, duration -> seekBar.setMax(duration));
+        // If playback is stopped, return the user home. This helps to avoid any funky issues with a player with no loaded file.
         playerViewModel.getState().observe(this, state -> {
             if ("stopped".equals(state)) {
                 Toast.makeText(this, "Playback stopped: returned to home", Toast.LENGTH_SHORT).show();

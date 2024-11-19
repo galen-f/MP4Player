@@ -96,4 +96,10 @@ public class PlayerViewModel extends AndroidViewModel {
         intent.putExtra("seek_position", position);
         context.startService(intent);
     }
+    public void navigateToHome(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+    }
+
 }

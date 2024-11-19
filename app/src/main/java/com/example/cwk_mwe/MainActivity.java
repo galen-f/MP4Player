@@ -29,6 +29,7 @@ import java.util.List;
 // - Add Color Changer *
 // - Add Playback speed settings *
 // - Test with "don't keep activities on" *
+// - Bookmarks not working
 // - reverse stack navigation ends service lifecycle
 
 //TODO:
