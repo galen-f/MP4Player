@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 import android.widget.Button;
 
@@ -29,7 +30,7 @@ import java.util.List;
 // - Add Color Changer *
 // - Add Playback speed settings *
 // - Test with "don't keep activities on" *
-// - Bookmarks not working
+// - Bookmarks not working *
 // - reverse stack navigation ends service lifecycle
 
 //TODO:

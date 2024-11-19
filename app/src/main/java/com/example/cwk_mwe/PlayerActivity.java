@@ -2,6 +2,7 @@ package com.example.cwk_mwe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -44,6 +45,11 @@ public class PlayerActivity extends AppCompatActivity {
         String filePath = getIntent().getStringExtra("FILE_PATH");
         if (filePath != null) {
             playerViewModel.play(filePath);
+            long timestampLong = getIntent().getLongExtra("TIMESTAMP", 0);
+            int timestamp = (int) timestampLong;
+            if (timestamp > 0) {
+                playerViewModel.seek(timestamp);
+            }
         } else {
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
         }
