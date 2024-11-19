@@ -33,14 +33,10 @@ import java.util.List;
 // - reverse stack navigation ends service lifecycle
 
 //TODO:
-// - PlayerActivity to ViewModel class *
 // - MainActivity to ViewModel class *
 // - Implement LiveData *
-// - Seekbar update through LiveData? *
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
-// - PlayerActivity isStopped and isPlaying states are inconsistent
 // - Empty playlist edge case in AudioService (Test)
-// - Better tie between notification state checks and actual state checks
 // - Need to avoid duplicate activities when navigating between activities with backstack
 // - Potential for memory leaks in the updateSeekBarRunnable
 // - denied permissions in ungraceful
