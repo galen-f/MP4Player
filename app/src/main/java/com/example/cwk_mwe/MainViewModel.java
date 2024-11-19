@@ -1,6 +1,8 @@
 package com.example.cwk_mwe;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
 
 import androidx.annotation.NonNull;
@@ -57,5 +59,11 @@ public class MainViewModel extends AndroidViewModel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void navigateToSettings(Context context) {
+        Intent intent = new Intent(context, SettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
     }
 }
