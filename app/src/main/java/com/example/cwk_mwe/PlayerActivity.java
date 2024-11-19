@@ -1,192 +1,76 @@
 package com.example.cwk_mwe;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import java.io.File;
+import androidx.lifecycle.ViewModelProvider;
 
 public class PlayerActivity extends AppCompatActivity {
-    private Button homeBtn, playBtn, pauseBtn, stopBtn, skipBtn, bookmarkBtn;
-    private SeekBar seekBar;
-    private boolean isPlaying = false, isStopped = false;
-    private String filePath, title;
-    private BroadcastReceiver positionReceiver = new BroadcastReceiver() {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int currentPosition = intent.getIntExtra("current_position", 0);
-            int duration = intent.getIntExtra("duration", 0);
-            seekBar.setMax(duration);
-            seekBar.setProgress(currentPosition);
-//            Log.d("PlayerActivity", "Current seekbar position: " + currentPosition + ", Duration: " + duration); // Debug log (triggers every second so left out for now)
-        }
-    };
+    private PlayerViewModel playerViewModel;
+    private SeekBar seekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        long startTimestamp = getIntent().getLongExtra("TIMESTAMP", 0);
+        // Initialize ViewModel
+        playerViewModel = new ViewModelProvider(this).get(PlayerViewModel.class);
 
-        homeBtn = findViewById(R.id.homeBtn);
-        playBtn = findViewById(R.id.playBtn);
-        pauseBtn = findViewById(R.id.pauseBtn);
-        stopBtn = findViewById(R.id.stopBtn);
-        skipBtn = findViewById(R.id.skipBtn);
-        bookmarkBtn = findViewById(R.id.bookmarkBtn);
+        // UI Components Initialization
+        findViewById(R.id.homeBtn).setOnClickListener(v -> navigateToHome());
+        findViewById(R.id.playBtn).setOnClickListener(v -> playAudio());
+        findViewById(R.id.pauseBtn).setOnClickListener(v -> pauseAudio());
+        findViewById(R.id.stopBtn).setOnClickListener(v -> stopAudio());
+        findViewById(R.id.skipBtn).setOnClickListener(v -> skipAudio());
+        findViewById(R.id.bookmarkBtn).setOnClickListener(v -> addBookmark());
 
         seekBar = findViewById(R.id.seekBar);
 
-        // Register positionReceiver to update SeekBar
-        LocalBroadcastManager.getInstance(this).registerReceiver(positionReceiver,
-                new IntentFilter("position_update"));
-
-        filePath = getIntent().getStringExtra("FILE_PATH");
-        title = filePath != null ? new File(filePath).getName() : "Unknown";
-
-        homeBtn.setOnClickListener(v -> {
-                    Intent intent = new Intent(PlayerActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    overridePendingTransition(0, 0);
-                });
-        playBtn.setOnClickListener(v -> audioPlay());
-        pauseBtn.setOnClickListener(v -> audioPause());
-        stopBtn.setOnClickListener(v -> stopAudioService());
-        skipBtn.setOnClickListener(v -> audioSkip());
-        bookmarkBtn.setOnClickListener(v -> addBookmark());
-
-        // Start the service on creation if a file path is provided
-        if (filePath != null) {
-            Intent intent = new Intent(this, AudioService.class);
-            intent.putExtra("FILE_PATH", filePath);
-            //intent.setAction(AudioService.ACTION_PLAY);
-            startService(intent);
-            isPlaying = true;
-        } else {
-            Toast.makeText(this, "Error: No file selected", Toast.LENGTH_SHORT).show();
-        }
-
-        // If the timestamp is provided (bookmark), seek to that position
-        if (startTimestamp > 0) {
-            seekToTimestamp(startTimestamp);
-        }
-
-        // Register the receiver for player state updates in case the service is stopped from notification
-        LocalBroadcastManager.getInstance(this).registerReceiver(playerStateReceiver,
-                new IntentFilter("player_state_update"));
-    }
-
-    private void audioPlay() {
-        if (filePath != null) {
-            Intent intent = new Intent(this, AudioService.class);
-            if (isStopped) {
-                Toast.makeText(this, "Audio has been stopped, please load new track", Toast.LENGTH_SHORT).show();
-            } else if (!isPlaying && !isStopped) {
-                intent.putExtra("FILE_PATH", filePath);
-                intent.setAction(AudioService.ACTION_PLAY);
-                startService(intent);
-                isPlaying = true;
-            } else {
-                Toast.makeText(this, "Audio is already playing", Toast.LENGTH_SHORT).show();
+        // Observe LiveData from PlayerViewModel
+        playerViewModel.getCurrentPosition().observe(this, position -> seekBar.setProgress(position));
+        playerViewModel.getDuration().observe(this, duration -> seekBar.setMax(duration));
+        playerViewModel.getState().observe(this, state -> {
+            if ("stopped".equals(state)) {
+                Toast.makeText(this, "Playback stopped: returned to home", Toast.LENGTH_SHORT).show();
+                navigateToHome();
             }
-        } else {
-            Toast.makeText(this, "No file path selected", Toast.LENGTH_SHORT).show();
-        }
+        });
     }
 
-    private void audioPause() {
+    private void playAudio() {
+        String filePath = getIntent().getStringExtra("FILE_PATH");
         if (filePath != null) {
-            Intent intent = new Intent(this, AudioService.class);
-            if (isStopped) {
-                Toast.makeText(this, "Audio has been stopped, please load new track", Toast.LENGTH_SHORT).show();
-            } else if (isPlaying && !isStopped) {
-                intent.setAction(AudioService.ACTION_PAUSE);
-                //Log.d("PlayerActivity", "Pause command sent");
-                isPlaying = false;
-            } else {
-                Toast.makeText(this, "Audio is already paused", Toast.LENGTH_SHORT).show();
-            }
-            startService(intent);
+            playerViewModel.play(filePath);
         } else {
-            Toast.makeText(this, "No file path selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void audioSkip() {
-        if (filePath != null) {
-            Intent intent = new Intent(this, AudioService.class);
-            intent.setAction(AudioService.ACTION_SKIP);
-            startService(intent);
-            isPlaying = true;
-
-            // Unstop audio if it was stopped
-            isStopped = false;
-            Toast.makeText(this, "Skipped to next track", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "No file path selected", Toast.LENGTH_SHORT).show();
-        }
+    private void pauseAudio() {
+        playerViewModel.pause();
     }
 
-    private void stopAudioService() {
-        Intent stopIntent = new Intent(this, AudioService.class);
-        stopIntent.setAction(AudioService.ACTION_STOP);
-        startService(stopIntent);
-        isStopped = true;
+    private void stopAudio() {
+        playerViewModel.stop();
+    }
 
-        Intent mainActivityIntent = new Intent(this, MainActivity.class);
-        startActivity(mainActivityIntent);
-        finish();
+    private void skipAudio() {
+        playerViewModel.skip();
     }
 
     private void addBookmark() {
-        int currentPosition = seekBar.getProgress();
-        BookmarkData bookmark = new BookmarkData(filePath, currentPosition, title);
-
-        boolean success = BookmarkManager.addBookmark(this, bookmark);
-        if (success) {
-            Toast.makeText(this, "Bookmark added successfully", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Failed to add bookmark", Toast.LENGTH_SHORT).show();
-        }
+        int position = seekBar.getProgress();
+        // Handle bookmark logic here (Broken)
     }
 
-    private void seekToTimestamp(long timestamp) {
-        // Seek to the provided timestamp after loading the file (bookmarks)
-        Intent intent = new Intent(this, AudioService.class);
-        intent.setAction(AudioService.ACTION_SEEK);
-        intent.putExtra("seek_position", (int) timestamp);
-        startService(intent);
-    }
-
-    private BroadcastReceiver playerStateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String state = intent.getStringExtra("state");
-            if ("stopped".equals(state)) {
-                // Close the activity and navigate back to MainActivity
-                Toast.makeText(PlayerActivity.this, "Playback stopped, returned to home screen!", Toast.LENGTH_SHORT).show();
-                Intent mainActivityIntent = new Intent(PlayerActivity.this, MainActivity.class);
-                startActivity(mainActivityIntent);
-                finish();
-            }
-        }
-    };
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopAudioService();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(positionReceiver);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(playerStateReceiver);
+    private void navigateToHome() {
+        // Navigate to home activity
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 }
