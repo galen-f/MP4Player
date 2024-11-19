@@ -1,17 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <!-- Bind the PlayerViewModel -->
+        <variable
+            name="viewModel"
+            type="com.example.cwk_mwe.PlayerViewModel" />
+        <variable
+            name="track"
+            type="com.example.cwk_mwe.TrackData" />
+        <variable
+            name="clickListener"
+            type="com.example.cwk_mwe.MusicRecyclerViewAdapter.OnItemClickListener" />
+    </data>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/music_file_name"
+        android:text="@{track.fileName}"
         android:padding="16dp"
+        android:onClick="@{() -> clickListener.onItemClick(track.filePath)}"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

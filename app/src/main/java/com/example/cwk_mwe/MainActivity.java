@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         // Recycler view and adapter
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new MusicRecyclerViewAdapter(this, new ArrayList<>(), filePath -> {
+        adapter = new MusicRecyclerViewAdapter(new ArrayList<>(), filePath -> {
             // on click, pass filePath to PlayerActivity and send user to PlayerActivity
             Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
             intent.putExtra("FILE_PATH", filePath);

@@ -8,11 +8,12 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.cwk_mwe.databinding.TrackItemBinding;
+
 import java.util.List;
 
 public class MusicRecyclerViewAdapter extends RecyclerView.Adapter<MusicRecyclerViewAdapter.MusicViewHolder> {
     public List<TrackData> trackData;
-    private Context context;
     private OnItemClickListener listener;
 
     // Define a listener interface for click handling
@@ -21,25 +22,22 @@ public class MusicRecyclerViewAdapter extends RecyclerView.Adapter<MusicRecycler
     }
 
     // Constructor with listener as third argument
-    public MusicRecyclerViewAdapter(Context context, List<TrackData> trackData, OnItemClickListener listener) {
-        this.context = context;
+    public MusicRecyclerViewAdapter(List<TrackData> trackData, OnItemClickListener listener) {
         this.trackData = trackData;
         this.listener = listener;
     }
 
     @Override
     public MusicViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.track_item, parent, false);
-        return new MusicViewHolder(view);
+        TrackItemBinding binding = TrackItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        return new MusicViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(MusicViewHolder holder, int position) {
-        TrackData trackDataItem = trackData.get(position);
-        holder.textView.setText(trackDataItem.fileName);
-
-        // Set the click listener for the item view
-        holder.itemView.setOnClickListener(v -> listener.onItemClick(trackDataItem.filePath));
+        // Bind the data and listener to the ViewHolder
+        TrackData track = trackData.get(position);
+        holder.bind(track, listener);
     }
 
     @Override
@@ -48,11 +46,18 @@ public class MusicRecyclerViewAdapter extends RecyclerView.Adapter<MusicRecycler
     }
 
     static class MusicViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;
 
-        MusicViewHolder(View itemView) {
-            super(itemView);
-            textView = itemView.findViewById(R.id.textView);
+        private final TrackItemBinding binding;
+
+        public MusicViewHolder(TrackItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+
+        public void bind(TrackData track, OnItemClickListener listener) {
+            binding.setTrack(track);
+            binding.setClickListener(listener);
+            binding.executePendingBindings(); // Ensures the binding happens immediately
         }
     }
 }
