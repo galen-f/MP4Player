@@ -49,23 +49,6 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
-    private void pauseAudio() {
-        playerViewModel.pause();
-    }
-
-    private void stopAudio() {
-        playerViewModel.stop();
-    }
-
-    private void skipAudio() {
-        playerViewModel.skip();
-    }
-
-    private void addBookmark() {
-        int position = seekBar.getProgress();
-        // Handle bookmark logic here (Broken)
-    }
-
     private void navigateToHome() {
         // Navigate to home activity
         startActivity(new Intent(this, MainActivity.class));

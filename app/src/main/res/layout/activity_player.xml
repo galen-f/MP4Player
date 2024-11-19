@@ -67,6 +67,7 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="50dp"
+            android:onClick="@{() -> viewModel.addBookmark()}"
             android:text="@string/add_bookmark"
             app:layout_constraintBottom_toTopOf="@+id/homeBtn"
             app:layout_constraintEnd_toEndOf="parent"

@@ -36,7 +36,6 @@ import java.util.List;
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
 // - Empty playlist edge case in AudioService (Test)
 // - denied permissions in ungraceful
-// - Data Binding library? *
 // - What happens after a song plays?
 
 /**

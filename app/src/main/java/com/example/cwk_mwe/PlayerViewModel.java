@@ -9,8 +9,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.widget.Toast;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerViewModel extends AndroidViewModel {
 
@@ -18,6 +22,7 @@ public class PlayerViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> duration = new MutableLiveData<>();
     private final MutableLiveData<String> state = new MutableLiveData<>();
     private final MutableLiveData<String> currentFilePath = new MutableLiveData<>();
+    private final MutableLiveData<List<BookmarkData>> bookmarks = new MutableLiveData<>(new ArrayList<>());
 
     private final Context context;
 
@@ -63,6 +68,11 @@ public class PlayerViewModel extends AndroidViewModel {
         return currentFilePath;
     }
 
+    public LiveData<List<BookmarkData>> getBookmarks() {
+        return bookmarks;
+    }
+
+
     public void play(String filePath) {
         Intent intent = new Intent(context, AudioService.class);
         intent.setAction(AudioService.ACTION_PLAY);
@@ -88,7 +98,6 @@ public class PlayerViewModel extends AndroidViewModel {
         intent.setAction(AudioService.ACTION_SKIP);
         context.startService(intent);
     }
-
     public void seek(int position) {
         // Used for bookmarks (broken)
         Intent intent = new Intent(context, AudioService.class);
@@ -102,4 +111,17 @@ public class PlayerViewModel extends AndroidViewModel {
         context.startActivity(intent);
     }
 
+    public void addBookmark() {
+        String filePath = currentFilePath.getValue();
+        String title = filePath.substring(filePath.lastIndexOf("/") + 1);
+        int timeStamp = currentPosition.getValue();
+
+        BookmarkData bookmark = new BookmarkData(filePath, timeStamp, title);
+        boolean success = BookmarkManager.addBookmark(context, bookmark);
+        if (success) {
+            Toast.makeText(context, "Bookmark added successfully", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "Failed to add bookmark", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
