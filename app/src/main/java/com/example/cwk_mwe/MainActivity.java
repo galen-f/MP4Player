@@ -34,6 +34,7 @@ import java.util.List;
 
 //TODO:
 // - PlayerActivity to ViewModel class *
+// - MainActivity to ViewModel class *
 // - Implement LiveData *
 // - Seekbar update through LiveData? *
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
