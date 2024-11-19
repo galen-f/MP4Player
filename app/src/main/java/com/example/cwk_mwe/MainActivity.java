@@ -37,7 +37,6 @@ import java.util.List;
 // - Need to avoid duplicate activities when navigating between activities with backstack
 // - Potential for memory leaks in the updateSeekBarRunnable
 // - denied permissions in ungraceful
-// - Utilize string constants *
 // - Data Binding library? *
 // - What happens after a song plays?
 // - Play song on activity load *
