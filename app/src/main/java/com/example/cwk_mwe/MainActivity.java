@@ -30,8 +30,6 @@ import java.util.List;
 // - Add Color Changer *
 // - Add Playback speed settings *
 // - Test with "don't keep activities on" *
-// - Bookmarks not working *
-// - reverse stack navigation ends service lifecycle
 
 //TODO:
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
@@ -50,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MusicRecyclerViewAdapter adapter;
     private MainViewModel mainViewModel;
+    private AlertDialog bookmarkDialog;
     private static final int PERMISSION_REQ_CODE = 100;
 
     @Override
@@ -145,11 +144,23 @@ public class MainActivity extends AppCompatActivity {
         });
         recyclerView.setAdapter(adapter);
 
-        new AlertDialog.Builder(this)
+        bookmarkDialog = new AlertDialog.Builder(this)
                 .setTitle("Bookmarks")
                 .setView(recyclerView)
                 .setNegativeButton("Close", (dialog, which) -> dialog.dismiss())
-                .create()
-                .show();
+                .create();
+
+        // Show the dialog
+        bookmarkDialog.show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Dismiss the dialog if it is still showing
+        if (bookmarkDialog != null && bookmarkDialog.isShowing()) {
+            bookmarkDialog.dismiss();
+            bookmarkDialog = null;
+        }
     }
 }
