@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class MusicRecyclerViewAdapter extends RecyclerView.Adapter<MusicRecyclerViewAdapter.MusicViewHolder> {
-    private List<TrackData> trackData;
+    public List<TrackData> trackData;
     private Context context;
     private OnItemClickListener listener;
 

@@ -17,11 +17,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import android.os.Environment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +32,6 @@ import java.util.List;
 // - reverse stack navigation ends service lifecycle
 
 //TODO:
-// - MainActivity to ViewModel class *
-// - Implement LiveData *
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
 // - Empty playlist edge case in AudioService (Test)
 // - Need to avoid duplicate activities when navigating between activities with backstack
@@ -42,6 +39,8 @@ import java.util.List;
 // - denied permissions in ungraceful
 // - Utilize string constants *
 // - Data Binding library? *
+// - What happens after a song plays?
+// - Play song on activity load *
 
 
 /**
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private Button settingsBtn, bookmarksBtn;
     private RecyclerView recyclerView;
     private MusicRecyclerViewAdapter adapter;
-    private List<TrackData> trackData = new ArrayList<>();
+    private MainViewModel mainViewModel;
     private static final int PERMISSION_REQ_CODE = 100;
 
     @Override
@@ -62,157 +61,99 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+
+        setupUI();
+        observeViewModel();
+
+        checkAndRequestPermissions();
+    }
+
+    private void setupUI() {
+        // Buttons and Elements
         settingsBtn = findViewById(R.id.settingsBtn);
         bookmarksBtn = findViewById(R.id.bookmarksBtn);
         recyclerView = findViewById(R.id.recyclerView);
 
+        // Recycler view and adapter
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        adapter = new MusicRecyclerViewAdapter(this, new ArrayList<>(), filePath -> {
+            // on click, pass filePath to PlayerActivity and send user to PlayerActivity
+            Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+            intent.putExtra("FILE_PATH", filePath);
+            startActivity(intent);
+        });
+        recyclerView.setAdapter(adapter);
+
+        //Button click listeners
         settingsBtn.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
             overridePendingTransition(0, 0);
         });
-        bookmarksBtn.setOnClickListener(v -> displayBookmarks());
+        bookmarksBtn.setOnClickListener(v -> mainViewModel.loadBookmarks());
+    }
 
-        // Set adapter with empty list initially
-        adapter = new MusicRecyclerViewAdapter(this, trackData, filePath -> {
-            // Handle click, pass filePath to PlayerActivity
-            Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
-            intent.putExtra("FILE_PATH", filePath);
-            //Log.d("MainActivity", "Passing file path to PlayerActivity: " + filePath);
-            startActivity(intent);
+    public void observeViewModel() {
+        // Observer of permission status
+        mainViewModel.permissionsGranted.observe(this, granted -> {
+            if (granted) {
+                mainViewModel.loadTracks();
+            } else {
+                Toast.makeText(this, "Permissions DENIED. Cannot load audiobook.", Toast.LENGTH_SHORT).show();
+            }
         });
-        recyclerView.setAdapter(adapter);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        // Observe track data
+        mainViewModel.trackData.observe(this, trackData -> {
+            adapter.trackData = trackData;
+            adapter.notifyDataSetChanged();
         });
-        checkAndRequestPermissions();
+
+        // Observe bookmarks
+        mainViewModel.bookmarks.observe(this, this::displayBookmarks);
     }
 
     private void checkAndRequestPermissions() {
-        // List of permissions to request
-        List<String> permissionsToRequest = new ArrayList<>();
-
-        // TODO:
-        // - Is this needed?
-
-        // Check READ_MEDIA_AUDIO permission
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            permissionsToRequest.add(Manifest.permission.READ_MEDIA_AUDIO);
-        }
-
-        // Check POST_NOTIFICATIONS permission for Android 13+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS);
-        }
-
-        // Request permissions if any are missing
-        if (!permissionsToRequest.isEmpty()) {
-            // Show rationale if needed
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_MEDIA_AUDIO) ||
-                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS))) {
-
-                new AlertDialog.Builder(this)
-                        .setTitle("Permissions Needed")
-                        .setMessage("These permissions are needed to access music files and display notifications.")
-                        .setPositiveButton("OK", (dialog, which) -> ActivityCompat.requestPermissions(MainActivity.this,
-                                permissionsToRequest.toArray(new String[0]),
-                                PERMISSION_REQ_CODE))
-                        .create()
-                        .show();
-            } else {
-                // Request the permissions directly
-                ActivityCompat.requestPermissions(this,
-                        permissionsToRequest.toArray(new String[0]),
-                        PERMISSION_REQ_CODE);
-            }
+        // Simplified permission handling, invoke ViewModel on success
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            mainViewModel.checkAndSetPermissions(true);
         } else {
-            // All permissions are granted, load the audiobook
-            loadAudiobook();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_AUDIO}, PERMISSION_REQ_CODE);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         if (requestCode == PERMISSION_REQ_CODE) {
-            boolean allPermissionsGranted = true;
-
-            // Check if all permissions were granted
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allPermissionsGranted = false;
-                    break;
-                }
-            }
-
-            if (allPermissionsGranted) {
-                // All required permissions were granted
-                loadAudiobook();
-            } else {
-                // Some permission was denied
-                Toast.makeText(this, "Permissions DENIED. Cannot load audiobook.", Toast.LENGTH_SHORT).show();
-            }
+            boolean allPermissionsGranted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            mainViewModel.checkAndSetPermissions(allPermissionsGranted);
         }
     }
 
-    protected void loadAudiobook() {
-        // Instead of loading one file, we populate the RecyclerView with all audio files
-        File musicDir = new File(Environment.getExternalStorageDirectory().getPath() + "/Music");
-        if (musicDir.exists() && musicDir.isDirectory()) {
-            File[] files = musicDir.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile() && file.getName().endsWith(".mp3")) { // Ignore if not an mp3 file
-                        trackData.add(new TrackData(file.getName(), file.getAbsolutePath()));
-                    }
-                }
-                // Notify adapter about data change
-                adapter.notifyDataSetChanged();
-            }
-        } else {
-            Toast.makeText(this, "No Music Directory Found", Toast.LENGTH_SHORT).show();
+    private void displayBookmarks(List<BookmarkData> bookmarks) {
+        if (bookmarks == null || bookmarks.isEmpty()) {
+            Toast.makeText(this, "No bookmarks available", Toast.LENGTH_SHORT).show();
+            return;
         }
-    }
 
-    private void displayBookmarks() {
-        try {
-            List<BookmarkData> bookmarks = BookmarkManager.loadBookmarks(this);
-            if (bookmarks.isEmpty()) {
-                Toast.makeText(this, "No bookmarks available", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        RecyclerView recyclerView = new RecyclerView(this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        BookmarkAdapter adapter = new BookmarkAdapter(bookmarks, bookmark -> {
+            Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+            intent.putExtra("FILE_PATH", bookmark.getAudiobookPath());
+            intent.putExtra("TIMESTAMP", bookmark.getTimestamp());
+            startActivity(intent);
+        });
+        recyclerView.setAdapter(adapter);
 
-            // Create a RecyclerView for bookmarks (modal)
-            RecyclerView recyclerView = new RecyclerView(this);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-            BookmarkAdapter adapter = new BookmarkAdapter(bookmarks, bookmark -> {
-                // On bookmark click, start the player
-                Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
-                intent.putExtra("FILE_PATH", bookmark.getAudiobookPath());
-                intent.putExtra("TIMESTAMP", bookmark.getTimestamp());
-                startActivity(intent);
-            });
-            recyclerView.setAdapter(adapter);
-
-            // Show bookmarks in a modal
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Bookmarks")
-                    .setView(recyclerView)
-                    .setNegativeButton("Close", (dialog, which) -> dialog.dismiss())
-                    .create()
-                    .show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error loading bookmarks", Toast.LENGTH_SHORT).show();
-        }
+        new AlertDialog.Builder(this)
+                .setTitle("Bookmarks")
+                .setView(recyclerView)
+                .setNegativeButton("Close", (dialog, which) -> dialog.dismiss())
+                .create()
+                .show();
     }
 }
