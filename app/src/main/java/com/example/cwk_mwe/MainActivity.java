@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 import android.widget.Button;
 
@@ -33,6 +32,17 @@ import java.util.List;
 // - Test with "don't keep activities on"
 // - reverse stack navigation ends service lifecycle
 
+//TODO:
+// - PlayerActivity to ViewModel class
+// - Seekbar update through LiveData?
+// - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications
+// - PlayerActivity isStopped and isPlaying states are inconsistent
+// - Empty playlist edge case in AudioService (Test)
+// - Better tie between notification state checks and actual state checks
+// - Need to avoid duplicate activities when navigating between activities with backstack
+// - Potential for memory leaks in the updateSeekBarRunnable
+// - denied permissions in ungraceful
+
 /**
  * This is the main activity, the home page. It displays the list of audio files in the Music directory.
  * It also allows for a modal to be created when clicking the bookmark button to allow the user to
@@ -44,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MusicRecyclerViewAdapter adapter;
     private List<TrackData> trackData = new ArrayList<>();
-    private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO_AND_NOTIFICATIONS = 100;
+    private static final int PERMISSION_REQ_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
         // List of permissions to request
         List<String> permissionsToRequest = new ArrayList<>();
 
+        // TODO:
+        // - Is this needed?
+
         // Check READ_MEDIA_AUDIO permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             permissionsToRequest.add(Manifest.permission.READ_MEDIA_AUDIO);
@@ -108,14 +121,14 @@ public class MainActivity extends AppCompatActivity {
                         .setMessage("These permissions are needed to access music files and display notifications.")
                         .setPositiveButton("OK", (dialog, which) -> ActivityCompat.requestPermissions(MainActivity.this,
                                 permissionsToRequest.toArray(new String[0]),
-                                MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO_AND_NOTIFICATIONS))
+                                PERMISSION_REQ_CODE))
                         .create()
                         .show();
             } else {
                 // Request the permissions directly
                 ActivityCompat.requestPermissions(this,
                         permissionsToRequest.toArray(new String[0]),
-                        MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO_AND_NOTIFICATIONS);
+                        PERMISSION_REQ_CODE);
             }
         } else {
             // All permissions are granted, load the audiobook
@@ -127,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == MY_PERMISSIONS_REQUEST_READ_MEDIA_AUDIO_AND_NOTIFICATIONS) {
+        if (requestCode == PERMISSION_REQ_CODE) {
             boolean allPermissionsGranted = true;
 
             // Check if all permissions were granted
