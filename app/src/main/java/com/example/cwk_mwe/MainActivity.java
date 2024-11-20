@@ -29,12 +29,11 @@ import java.util.List;
 //TODO: additions
 // - Progress bar not seekbar
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
-// - Move playback speed logic into AppSharedViewModel
 
 //TODO: errors
-// - Adjusting playback speed auto starts music
 // - Adjust speed doesn't adjust for multiple songs.
 // - exiting and re-entering settings resets the speed
+// - changing playback speed while paused doesnt actually change the playback speed
 
 //TODO: tests
 // - Empty playlist edge case in AudioService

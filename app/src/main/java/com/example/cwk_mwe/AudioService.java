@@ -87,16 +87,6 @@ public class AudioService extends Service {
                 playFile(filePath);
                 // No log because playFile has a log
             }
-        } else if (audiobookPlayer.getFilePath() == null) {
-            // No file is currently playing, play the first track from the playlist
-            if (!playlist.isEmpty()) {
-                playFile(playlist.get(0));
-                Log.d("AudioService", "Playing first track in playlist: " + playlist.get(0));
-            } else {
-                Log.e("AudioService", "Playlist is empty. Stopping service.");
-                stopSelf();
-                return START_NOT_STICKY;
-            }
         }
 
         if (action != null && audiobookPlayer != null) {
@@ -251,6 +241,7 @@ public class AudioService extends Service {
         currentPlaybackSpeed = speed;
         if (audiobookPlayer != null && audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PLAYING) {
             audiobookPlayer.setPlaybackSpeed(speed);
+
         }
         Log.d("AudioService", "Playback speed updated: " + speed);
     }
