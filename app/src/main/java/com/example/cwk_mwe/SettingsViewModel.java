@@ -4,39 +4,30 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 public class SettingsViewModel extends ViewModel {
-    private final MutableLiveData<String> playbackSpeedInput = new MutableLiveData<>();
+    private float playbackSpeed = 1.0f;
     private Context context;
 
     public void setContext(Context context) {
         this.context = context;
     }
 
-    public LiveData<String> getPlaybackSpeedInput() {
-        return playbackSpeedInput;
-    }
+    public void updatePlaybackSpeedFromSeekBar(int progress) {
+        // Map progress to playback speed
+        playbackSpeed = progress == 0 ? 0.5f : progress;
 
-    public void updatePlaybackSpeedInput(String speed) {
-        playbackSpeedInput.setValue(speed);
-        Log.d("SettingsViewModel", "Playback speed input updated: " + speed);
+        // Apply playback speed immediately
+        applyPlaybackSpeed();
     }
 
     public void applyPlaybackSpeed() {
-        if (context != null && playbackSpeedInput.getValue() != null) {
-            try {
-                float speed = Float.parseFloat(playbackSpeedInput.getValue());
-                Intent intent = new Intent(context, AudioService.class);
-                intent.setAction(AudioService.ACTION_SET_SPEED);
-                intent.putExtra("speed", speed);
-                context.startService(intent);
-                Log.d("SettingsViewModel", "Playback speed sent to AudioService: " + speed);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
+        if (context != null) {
+            Intent intent = new Intent(context, AudioService.class);
+            intent.setAction(AudioService.ACTION_SET_SPEED);
+            intent.putExtra("speed", playbackSpeed);
+            context.startService(intent);
         }
     }
 

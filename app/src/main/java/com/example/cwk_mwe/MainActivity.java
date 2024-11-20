@@ -26,14 +26,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO:
+//TODO: additions
 // - Add Color Changer *
-// - Add Playback speed settings *
-
-//TODO:
+// - Progress bar not seekbar
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
-// - Empty playlist edge case in AudioService (Test)
-// - Any other way of spawning the seekbar without accessing mediaplayer?
+
+//TODO: errors
+// - Adjusting playback speed auto starts music
+
+//TODO: tests
+// - Empty playlist edge case in AudioService
+// - Remove device data
+// - permissions denied edge case
+// - Playback speed persistence
 
 /**
  * This is the main activity, the home page. It displays the list of audio files in the Music directory.
