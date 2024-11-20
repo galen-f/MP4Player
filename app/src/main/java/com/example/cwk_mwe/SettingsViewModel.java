@@ -23,31 +23,12 @@ public class SettingsViewModel extends ViewModel {
         return playbackSpeed;
     }
 
-    public MutableLiveData<String> getSelectedColor() {
-        return selectedColor;
-    }
-
     public void updatePlaybackSpeed(int progress) {
         // Map progress to playback speed
         playbackSpeed = progress == 0 ? 0.5f : progress;
 
         // Apply playback speed immediately
         applyPlaybackSpeed();
-    }
-
-    public void updateSelectedColor(String color) {
-        selectedColor.setValue(color);
-        saveSelectedColor(color);
-    }
-
-    private void saveSelectedColor(String color) {
-        if (context!= null) {
-            SharedPreferences prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString("background_color", color);
-            editor.apply();
-            Log.d("SettingsViewModel", "Saved background color: " + color);
-        }
     }
 
     private void loadSettings() {
