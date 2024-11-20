@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -56,6 +57,7 @@ public class MainViewModel extends AndroidViewModel {
         try {
             List<BookmarkData> bookmarks = BookmarkManager.loadBookmarks(getApplication());
             _bookmarks.postValue(bookmarks);
+            Log.d("MainViewModel", "Loaded bookmarks button pressed");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -65,5 +67,6 @@ public class MainViewModel extends AndroidViewModel {
         Intent intent = new Intent(context, SettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         context.startActivity(intent);
+        Log.d("MainViewModel", "Settings button pressed");
     }
 }

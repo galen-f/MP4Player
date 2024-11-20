@@ -3,9 +3,7 @@ package com.example.cwk_mwe;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 import android.widget.Button;
 
@@ -14,15 +12,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.IOException;
+import com.example.cwk_mwe.databinding.ActivityMainBinding;
+import com.example.cwk_mwe.databinding.ActivityPlayerBinding;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +32,7 @@ import java.util.List;
 // - Adjust speed doesn't adjust for multiple songs.
 // - exiting and re-entering settings resets the speed
 // - changing playback speed while paused doesnt actually change the playback speed
+// - changing playback speed while no song is playing starts the service empty
 
 //TODO: tests
 // - Empty playlist edge case in AudioService
@@ -64,44 +63,29 @@ public class MainActivity extends AppCompatActivity {
         appSharedViewModel = new ViewModelProvider(this).get(AppSharedViewModel.class);
         appSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
 
-        // Force the emission of the current color
-        String currentColor = getApplication()
-                .getSharedPreferences("SettingsPrefs", MODE_PRIVATE)
-                .getString("background_color", "White");
-        appSharedViewModel.setBackgroundColor(currentColor);
+        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
+        // Initialize Viewmodel
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-
-        setupUI();
-        observeViewModel();
+        binding.setViewModel(mainViewModel);
+        binding.setLifecycleOwner(this);
 
         checkAndRequestPermissions();
+        setupRecyclerView();
+        observeViewModel();
     }
 
-    private void setupUI() {
-        // Buttons and Elements
-        settingsBtn = findViewById(R.id.settingsBtn);
-        bookmarksBtn = findViewById(R.id.bookmarksBtn);
-        recyclerView = findViewById(R.id.recyclerView);
-
-        // Recycler view and adapter
+    private void setupRecyclerView() {
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new MusicRecyclerViewAdapter(new ArrayList<>(), filePath -> {
-            // on click, pass filePath to PlayerActivity and send user to PlayerActivity
             Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
             intent.putExtra("FILE_PATH", filePath);
             startActivity(intent);
         });
-        recyclerView.setAdapter(adapter);
 
-        //Button click listeners
-        settingsBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
-            overridePendingTransition(0, 0);
-        });
-        bookmarksBtn.setOnClickListener(v -> mainViewModel.loadBookmarks());
+        recyclerView.setAdapter(adapter);
     }
 
     public void observeViewModel() {
