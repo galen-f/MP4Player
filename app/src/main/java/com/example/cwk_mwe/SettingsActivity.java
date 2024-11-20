@@ -1,11 +1,11 @@
 package com.example.cwk_mwe;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -16,10 +16,23 @@ import com.example.cwk_mwe.databinding.ActivitySettingsBinding;
 
 public class SettingsActivity extends AppCompatActivity {
     private SettingsViewModel settingsViewModel;
+    private AppSharedViewModel appSharedViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        appSharedViewModel = new ViewModelProvider(this).get(AppSharedViewModel.class);
+
+        // Observe the background color and apply it dynamically
+        appSharedViewModel.getBackgroundColor().observe(this, color -> {
+            if (color != null) {
+                findViewById(android.R.id.content).setBackgroundColor(color);
+                Log.d("MainActivity", "Background color: " + color);
+            } else {
+                Log.d("MainActivity", "Background color is null");
+            }
+        });
 
         // Data binding setup
         ActivitySettingsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
@@ -28,6 +41,11 @@ public class SettingsActivity extends AppCompatActivity {
         binding.setViewModel(settingsViewModel);
         binding.setLifecycleOwner(this);
 
+        setupSpeedSeekBar();
+        setupColorSpinner();
+    }
+
+    private void setupSpeedSeekBar() {
         // Setup SeekBar for playback speed
         SeekBar speedSeekBar = findViewById(R.id.speed_seekbar);
         speedSeekBar.setMax(4); // Already set in XML, but just in case
@@ -36,7 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
         speedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                settingsViewModel.updatePlaybackSpeedFromSeekBar(progress);
+                settingsViewModel.updatePlaybackSpeed(progress);
             }
 
             @Override
@@ -46,6 +64,54 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                // No action needed
+            }
+        });
+    }
+
+    private void setupColorSpinner() {
+        Spinner colorSpinner = findViewById(R.id.color_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this,
+                R.array.color_options,
+                android.R.layout.simple_spinner_item
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        colorSpinner.setAdapter(adapter);
+
+        // Flag to avoid feedback loop
+        final boolean[] isSpinnerUpdateFromObserver = {false};
+
+        // Observe the background color LiveData
+        appSharedViewModel.getBackgroundColor().observe(this, color -> {
+            if (!isSpinnerUpdateFromObserver[0]) {
+                // Get the current color name
+                String currentColor = getApplication()
+                        .getSharedPreferences("SettingsPrefs", MODE_PRIVATE)
+                        .getString("background_color", "White");
+
+                int position = adapter.getPosition(currentColor);
+                if (position >= 0 && position != colorSpinner.getSelectedItemPosition()) {
+                    // Only set spinner selection if it has changed
+                    colorSpinner.setSelection(position);
+                }
+            }
+        });
+
+        // Set up a listener for color selection
+        colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, android.view.View view, int position, long id) {
+                String selectedColor = parent.getItemAtPosition(position).toString();
+
+                // Prevent feedback loop by marking updates from spinner
+                isSpinnerUpdateFromObserver[0] = true;
+                appSharedViewModel.setBackgroundColor(selectedColor);
+                isSpinnerUpdateFromObserver[0] = false; // Reset the flag
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
                 // No action needed
             }
         });

@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.cwk_mwe.databinding.ActivityPlayerBinding;
 
 public class PlayerActivity extends AppCompatActivity {
-
+    private AppSharedViewModel appSharedViewModel;
     private PlayerViewModel playerViewModel;
     private SeekBar seekBar;
 
@@ -21,6 +21,18 @@ public class PlayerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
+
+        appSharedViewModel = new ViewModelProvider(this).get(AppSharedViewModel.class);
+
+        // Observe the background color and apply it dynamically
+        appSharedViewModel.getBackgroundColor().observe(this, color -> {
+            if (color != null) {
+                findViewById(android.R.id.content).setBackgroundColor(color);
+                Log.d("MainActivity", "Background color: " + color);
+            } else {
+                Log.d("MainActivity", "Background color is null");
+            }
+        });
 
         ActivityPlayerBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_player);
 

@@ -33,6 +33,8 @@ import java.util.List;
 
 //TODO: errors
 // - Adjusting playback speed auto starts music
+// - Adjust speed doesn't adjust for multiple songs.
+// - exiting and re-entering settings resets the speed
 
 //TODO: tests
 // - Empty playlist edge case in AudioService
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private MusicRecyclerViewAdapter adapter;
     private MainViewModel mainViewModel;
+    private AppSharedViewModel appSharedViewModel;
     private AlertDialog bookmarkDialog;
     private static final int PERMISSION_REQ_CODE = 100;
 
@@ -58,6 +61,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        appSharedViewModel = new ViewModelProvider(this).get(AppSharedViewModel.class);
+
+        // Observe the background color and apply it dynamically
+        appSharedViewModel.getBackgroundColor().observe(this, color -> {
+            if (color != null) {
+                findViewById(android.R.id.content).setBackgroundColor(color);
+                Log.d("MainActivity", "Background color: " + color);
+            } else {
+                Log.d("MainActivity", "Background color is null");
+            }
+        });
+
+        // Force the emission of the current color
+        String currentColor = getApplication()
+                .getSharedPreferences("SettingsPrefs", MODE_PRIVATE)
+                .getString("background_color", "White");
+        appSharedViewModel.setBackgroundColor(currentColor);
 
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
