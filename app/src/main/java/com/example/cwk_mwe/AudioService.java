@@ -20,6 +20,9 @@ import java.util.List;
 
 public class AudioService extends Service {
 
+    // TODO:
+    // - Not MVVM adherent
+
     // Action Variables
     public static final String ACTION_PLAY = "com.example.cwk_mwe.ACTION_PLAY";
     public static final String ACTION_PAUSE = "com.example.cwk_mwe.ACTION_PAUSE";
@@ -210,7 +213,7 @@ public class AudioService extends Service {
         public void run() {
             if (audiobookPlayer != null && audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PLAYING) {
                 int currentPosition = audiobookPlayer.getProgress();
-                int duration = audiobookPlayer.mediaPlayer != null ? audiobookPlayer.mediaPlayer.getDuration() : 0;
+                int duration = audiobookPlayer.mediaPlayer != null ? audiobookPlayer.mediaPlayer.getDuration() : 0;  // Any other way of doing this?
 
                 Intent intent = new Intent("position_update");
                 intent.putExtra("current_position", currentPosition);
