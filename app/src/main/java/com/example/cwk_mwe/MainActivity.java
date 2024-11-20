@@ -24,15 +24,6 @@ import com.example.cwk_mwe.databinding.ActivityPlayerBinding;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: additions
-// - Progress bar not seekbar
-// - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
-
-//TODO: errors
-// - exiting and re-entering settings resets the speed
-// - changing playback speed while paused doesnt actually change the playback speed
-// - changing playback speed while no song is playing starts the service empty
-
 //TODO: tests
 // - Empty playlist edge case in AudioService
 // - Remove device data

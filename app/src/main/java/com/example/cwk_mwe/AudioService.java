@@ -71,11 +71,14 @@ public class AudioService extends Service {
             playlist = FileUtils.getAudioFiles(); // Load the "playlist"
         }
 
-        if (filePath == null && playlist != null && !playlist.isEmpty()) {
-            // If no filePath is provided, play the first song in the playlist
-            currentTrackIndex = 0; // Ensure it starts with the first track
-            filePath = playlist.get(currentTrackIndex);
-            Log.d("AudioService", "No file path provided. Playing first song in the playlist: " + filePath);
+        if (filePath == null && (audiobookPlayer.getFilePath() == null || audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.STOPPED)) {
+            if (playlist != null && !playlist.isEmpty()) {
+                currentTrackIndex = 0; // Ensure it starts with the first track
+                filePath = playlist.get(currentTrackIndex);
+                Log.d("AudioService", "No file path provided and no track loaded. Playing first song in the playlist: " + filePath);
+            } else {
+                Log.w("AudioService", "Playlist is empty. Cannot play a track.");
+            }
         }
 
         handler.post(updateSeekBarRunnable); // Start runnable for the progress bar
