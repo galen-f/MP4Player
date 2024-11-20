@@ -28,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
         // Data binding setup
         ActivitySettingsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
         settingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
-        settingsViewModel.setContext(this);
+        settingsViewModel.setContext(this, appSharedViewModel);
         binding.setViewModel(settingsViewModel);
         binding.setLifecycleOwner(this);
 

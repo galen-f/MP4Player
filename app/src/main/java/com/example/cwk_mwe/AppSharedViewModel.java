@@ -1,6 +1,8 @@
 package com.example.cwk_mwe;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.View;
 
@@ -12,10 +14,12 @@ import androidx.lifecycle.MutableLiveData;
 
 public class AppSharedViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> backgroundColor = new MutableLiveData<>(Color.WHITE);
+    private final MutableLiveData<Float> playbackSpeed = new MutableLiveData<>(1.0f);
 
     public AppSharedViewModel(@NonNull Application application) {
         super(application);
         loadBackgroundColor();
+        loadPlaybackSpeed();
     }
 
     public LiveData<Integer> getBackgroundColor() {
@@ -58,6 +62,42 @@ public class AppSharedViewModel extends AndroidViewModel {
                 .edit()
                 .putString("background_color", color)
                 .apply();
+    }
+
+
+    public LiveData<Float> getPlaybackSpeed() {
+        return playbackSpeed;
+    }
+
+    void setPlaybackSpeed(int progress) {
+        float speed = progress == 0 ? 0.5f : progress;
+        playbackSpeed.setValue(speed);
+        savePlaybackSpeed();
+        applyPlaybackSpeed();
+    }
+
+    private void loadPlaybackSpeed() {
+        float speed = getApplication()
+                .getSharedPreferences("SettingsPrefs", Application.MODE_PRIVATE)
+                .getFloat("playback_speed", 1.0f);
+
+        playbackSpeed.setValue(speed);
+    }
+
+    private void savePlaybackSpeed() {
+        getApplication()
+                .getSharedPreferences("SettingsPrefs", Application.MODE_PRIVATE)
+                .edit()
+                .putFloat("playback_speed", playbackSpeed.getValue())
+                .apply();
+    }
+
+    private void applyPlaybackSpeed() {
+        Context context = getApplication().getApplicationContext();
+        Intent intent = new Intent(context, AudioService.class);
+        intent.setAction(AudioService.ACTION_SET_SPEED);
+        intent.putExtra("speed", playbackSpeed.getValue());
+        context.startService(intent);
     }
 
     /**
