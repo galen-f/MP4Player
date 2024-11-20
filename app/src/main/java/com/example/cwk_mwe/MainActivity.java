@@ -29,7 +29,6 @@ import java.util.List;
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
 
 //TODO: errors
-// - Adjust speed doesn't adjust for multiple songs.
 // - exiting and re-entering settings resets the speed
 // - changing playback speed while paused doesnt actually change the playback speed
 // - changing playback speed while no song is playing starts the service empty
@@ -38,7 +37,6 @@ import java.util.List;
 // - Empty playlist edge case in AudioService
 // - Remove device data
 // - permissions denied edge case
-// - Playback speed persistence
 
 /**
  * This is the main activity, the home page. It displays the list of audio files in the Music directory.
@@ -47,8 +45,6 @@ import java.util.List;
  */
 
 public class MainActivity extends AppCompatActivity {
-    private Button settingsBtn, bookmarksBtn;
-    private RecyclerView recyclerView;
     private MusicRecyclerViewAdapter adapter;
     private MainViewModel mainViewModel;
     private AppSharedViewModel appSharedViewModel;
