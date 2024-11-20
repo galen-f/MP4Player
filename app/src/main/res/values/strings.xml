@@ -16,4 +16,6 @@
     <string name="stopBtn">Stop</string>
     <string name="skipBtn">Skip</string>
     <string name="music_file_name">Music File Name</string>
+    <string name="enter_playback_speed">Enter Playback Speed</string>
+    <string name="set_speed">Set Speed</string>
 </resources>

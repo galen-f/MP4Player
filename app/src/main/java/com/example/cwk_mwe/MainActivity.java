@@ -29,13 +29,11 @@ import java.util.List;
 //TODO:
 // - Add Color Changer *
 // - Add Playback speed settings *
-// - Test with "don't keep activities on" *
 
 //TODO:
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
 // - Empty playlist edge case in AudioService (Test)
-// - denied permissions in ungraceful
-// - What happens after a song plays?
+// - Any other way of spawning the seekbar without accessing mediaplayer?
 
 /**
  * This is the main activity, the home page. It displays the list of audio files in the Music directory.
