@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Build;
@@ -29,6 +30,7 @@ public class AudioService extends Service {
     public static final String ACTION_STOP = "com.example.cwk_mwe.ACTION_STOP";
     public static final String ACTION_SEEK = "com.example.cwk_mwe.ACTION_SEEK";
     public static final String ACTION_SKIP = "com.example.cwk_mwe.ACTION_SKIP";
+    public static final String ACTION_SET_SPEED = "com.example.cwk_mwe.ACTION_SET_SPEED";
 
     // Service Variables
     public static final String CHANNEL_ID = "AudioServiceChannel";
@@ -39,10 +41,18 @@ public class AudioService extends Service {
     private List<String> playlist = new ArrayList<>();
     private int currentTrackIndex = 0;
 
+    // Settings Variabels
+    private float currentPlaybackSpeed = 1.0f;
+
     @Override
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
+
+        // Settings shared preferences
+        SharedPreferences prefs = getSharedPreferences("PlaybackPrefs", MODE_PRIVATE);
+        currentPlaybackSpeed = prefs.getFloat("playbackSpeed", 1.0f);
+
         audiobookPlayer = new AudiobookPlayer();
         Log.d("AudioService.onCreate", "AudiobookPlayer created");
 
@@ -54,6 +64,11 @@ public class AudioService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
         String filePath = intent.getStringExtra("FILE_PATH");
+
+        if (ACTION_SET_SPEED.equals(action)) {
+            float speed = intent.getFloatExtra("speed", 1.0f);
+            setPlaybackSpeed(speed);
+        }
 
         if (playlist == null || playlist.isEmpty()) {
             playlist = FileUtils.getAudioFiles(); // Load the "playlist"
@@ -232,9 +247,17 @@ public class AudioService extends Service {
         return null;
     }
 
+    public void setPlaybackSpeed(float speed) {
+        currentPlaybackSpeed = speed;
+        if (audiobookPlayer != null && audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PLAYING) {
+            audiobookPlayer.setPlaybackSpeed(speed);
+        }
+        Log.d("AudioService", "Playback speed updated: " + speed);
+    }
+
     private void playFile(String filePath) {
         audiobookPlayer.stop();
-        audiobookPlayer.load(filePath, 1.0f);
+        audiobookPlayer.load(filePath, currentPlaybackSpeed);
         audiobookPlayer.play();
         updateNotification("Playing Audio");
         Log.d("AudioService", "Playing file: " + filePath);
@@ -278,6 +301,13 @@ public class AudioService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Save playback speed to preferences before destruction
+        SharedPreferences prefs = getSharedPreferences("PlaybackPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putFloat("playback_speed", currentPlaybackSpeed);
+        editor.apply();
+
         // Remove callbacks to prevent memory leaks
         handler.removeCallbacks(updateSeekBarRunnable);
         audiobookPlayer.stop(); // Stop and release resources in AudiobookPlayer

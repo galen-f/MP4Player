@@ -23,6 +23,7 @@ public class PlayerViewModel extends AndroidViewModel {
     private final MutableLiveData<String> state = new MutableLiveData<>();
     private final MutableLiveData<String> currentFilePath = new MutableLiveData<>();
     private final MutableLiveData<List<BookmarkData>> bookmarks = new MutableLiveData<>(new ArrayList<>());
+    private float playbackSpeed = 1.0f;
 
     private final Context context;
 
@@ -68,10 +69,22 @@ public class PlayerViewModel extends AndroidViewModel {
         return currentFilePath;
     }
 
+    public float getPlaybackSpeed() {
+        return playbackSpeed;
+    }
+
     public LiveData<List<BookmarkData>> getBookmarks() {
         return bookmarks;
     }
 
+    public void setPlaybackSpeed(float speed) {
+        playbackSpeed = speed;
+        // Send updated speed to AudioService
+        Intent intent = new Intent(context, AudioService.class);
+        intent.setAction(AudioService.ACTION_SET_SPEED);
+        intent.putExtra("speed", speed);
+        context.startService(intent);
+    }
 
     public void play(String filePath) {
         Intent intent = new Intent(context, AudioService.class);

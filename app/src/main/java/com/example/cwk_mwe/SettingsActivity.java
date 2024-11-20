@@ -2,7 +2,9 @@ package com.example.cwk_mwe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -21,8 +23,18 @@ public class SettingsActivity extends AppCompatActivity {
         // Data binding setup
         ActivitySettingsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
         settingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
-        settingsViewModel.setContext(this); // Pass context to ViewModel for navigation
+        settingsViewModel.setContext(this);
         binding.setViewModel(settingsViewModel);
         binding.setLifecycleOwner(this);
+
+
+        // Set button listener to apply playback speed
+        EditText playbackSpeedEditText = findViewById(R.id.editText_playback_speed);
+        findViewById(R.id.playbackBtn).setOnClickListener(v -> {
+            String speedInput = playbackSpeedEditText.getText().toString();
+            settingsViewModel.updatePlaybackSpeedInput(speedInput);
+            settingsViewModel.applyPlaybackSpeed();
+            Log.d("SettingsActivity", "Playback speed input: " + speedInput);
+        });
     }
 }

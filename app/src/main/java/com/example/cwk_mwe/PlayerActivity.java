@@ -53,6 +53,13 @@ public class PlayerActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
         }
+
+        // Request updated playback speed from AudioService
+        float playbackSpeed = playerViewModel.getPlaybackSpeed(); // Add getter in ViewModel
+        Intent intent = new Intent(this, AudioService.class);
+        intent.setAction(AudioService.ACTION_SET_SPEED);
+        intent.putExtra("speed", playbackSpeed);
+        startService(intent);
     }
 
     private void navigateToHome() {
