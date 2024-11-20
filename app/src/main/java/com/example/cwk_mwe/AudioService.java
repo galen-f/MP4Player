@@ -178,9 +178,17 @@ public class AudioService extends Service {
         currentPlaybackSpeed = speed;
         if (audiobookPlayer != null && audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PLAYING) {
             audiobookPlayer.setPlaybackSpeed(speed);
-
         }
         Log.d("AudioService", "Playback speed updated: " + speed);
+
+        /*
+        * Because of the AudiobookPlayer class, changing speed immediately plays the mediaPlayer.
+        * This is dumb for obvious reasons but the specs say I can't change the AudiobookPlayer
+        * I have been trying for a solid 2 hours to fix the issue here, but its always glitchy
+        * so if you change the speed while no track is playing, it just plays the first track
+        * I really don't like this because I could easily fix it but itd be against the specs
+        * We should be allowed to create our own mediaPlayer wrapper class.
+         */
     }
 
     private void playFile(String filePath) {
