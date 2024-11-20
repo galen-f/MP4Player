@@ -71,6 +71,13 @@ public class AudioService extends Service {
             playlist = FileUtils.getAudioFiles(); // Load the "playlist"
         }
 
+        if (filePath == null && playlist != null && !playlist.isEmpty()) {
+            // If no filePath is provided, play the first song in the playlist
+            currentTrackIndex = 0; // Ensure it starts with the first track
+            filePath = playlist.get(currentTrackIndex);
+            Log.d("AudioService", "No file path provided. Playing first song in the playlist: " + filePath);
+        }
+
         handler.post(updateSeekBarRunnable); // Start runnable for the progress bar
         notificationHelper.updateNotification("Playing Audio"); // Update notification
 
