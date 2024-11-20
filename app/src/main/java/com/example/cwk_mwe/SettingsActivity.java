@@ -23,16 +23,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         appSharedViewModel = new ViewModelProvider(this).get(AppSharedViewModel.class);
-
-        // Observe the background color and apply it dynamically
-        appSharedViewModel.getBackgroundColor().observe(this, color -> {
-            if (color != null) {
-                findViewById(android.R.id.content).setBackgroundColor(color);
-                Log.d("MainActivity", "Background color: " + color);
-            } else {
-                Log.d("MainActivity", "Background color is null");
-            }
-        });
+        appSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
 
         // Data binding setup
         ActivitySettingsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_settings);

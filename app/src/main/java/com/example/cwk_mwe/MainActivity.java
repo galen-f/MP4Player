@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO: additions
-// - Add Color Changer *
 // - Progress bar not seekbar
 // - Create a new AudioManager class to handle audio playback and leave AudioService only in control of lifecycle and notifications *
+// - Move playback speed logic into AppSharedViewModel
 
 //TODO: errors
 // - Adjusting playback speed auto starts music
@@ -63,16 +63,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         appSharedViewModel = new ViewModelProvider(this).get(AppSharedViewModel.class);
-
-        // Observe the background color and apply it dynamically
-        appSharedViewModel.getBackgroundColor().observe(this, color -> {
-            if (color != null) {
-                findViewById(android.R.id.content).setBackgroundColor(color);
-                Log.d("MainActivity", "Background color: " + color);
-            } else {
-                Log.d("MainActivity", "Background color is null");
-            }
-        });
+        appSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
 
         // Force the emission of the current color
         String currentColor = getApplication()

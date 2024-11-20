@@ -2,9 +2,11 @@ package com.example.cwk_mwe;
 
 import android.app.Application;
 import android.graphics.Color;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -56,5 +58,16 @@ public class AppSharedViewModel extends AndroidViewModel {
                 .edit()
                 .putString("background_color", color)
                 .apply();
+    }
+
+    /**
+     * Observes background color changes and applies it dynamically to the given view.
+     */
+    public void applyBackgroundColor(LifecycleOwner owner, View targetView) {
+        getBackgroundColor().observe(owner, color -> {
+            if (color != null) {
+                targetView.setBackgroundColor(color);
+            }
+        });
     }
 }
