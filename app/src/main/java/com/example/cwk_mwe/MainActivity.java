@@ -1,8 +1,6 @@
 package com.example.cwk_mwe;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -11,8 +9,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -34,15 +30,19 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TextView emptyView;
     private MusicRecyclerViewAdapter adapter;
+    private PermissionManager permissionManager;
     private MainViewModel mainViewModel;
     private GlobalSharedViewModel globalSharedViewModel;
     private AlertDialog bookmarkDialog;
-    private static final int PERMISSION_REQ_CODE = 100;
+    public static final int PERMISSION_REQ_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize permission manager
+        permissionManager = new PermissionManager(this);
 
         globalSharedViewModel = new ViewModelProvider(this).get(GlobalSharedViewModel.class);
         globalSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         emptyView = findViewById(R.id.empty_message);
 
-        checkAndRequestPermissions();
+        permissionManager.checkAndRequestPermissions();
+
         setupRecyclerView();
         observeViewModel();
     }
@@ -105,22 +106,21 @@ public class MainActivity extends AppCompatActivity {
         mainViewModel.bookmarks.observe(this, this::displayBookmarks);
     }
 
-    private void checkAndRequestPermissions() {
-        // Simplified permission handling, invoke ViewModel on success
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-            mainViewModel.checkAndSetPermissions(true);
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_AUDIO}, PERMISSION_REQ_CODE);
-        }
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQ_CODE) {
-            boolean allPermissionsGranted = grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED;
-            mainViewModel.checkAndSetPermissions(allPermissionsGranted);
+
+        // Delegate permission handling to PermissionManager
+        boolean allPermissionsGranted = permissionManager.handlePermissionResult(requestCode, grantResults);
+        mainViewModel.checkAndSetPermissions(allPermissionsGranted);
+
+        if (!allPermissionsGranted) {
+            Toast.makeText(this, "Permissions denied. Functionality limited", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public MainViewModel getMainViewModel() {
+        return mainViewModel;
     }
 
     private void displayBookmarks(List<BookmarkData> bookmarks) {
