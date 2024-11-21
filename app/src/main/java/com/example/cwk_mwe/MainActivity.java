@@ -101,12 +101,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Observe track data
-        mainViewModel.trackData.observe(this, trackData -> {
-            adapter.trackData = trackData;
-            adapter.notifyDataSetChanged();
-        });
-
         // Observe bookmarks
         mainViewModel.bookmarks.observe(this, this::displayBookmarks);
     }
