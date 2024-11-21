@@ -12,6 +12,11 @@ import com.example.cwk_mwe.databinding.TrackItemBinding;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying a list of audio tracks in a RecyclerView within the main activity.
+ * Facilitates interaction with track items, including navigation to the player screen upon selection.
+ */
+
 public class MusicRecyclerViewAdapter extends RecyclerView.Adapter<MusicRecyclerViewAdapter.MusicViewHolder> {
     public List<TrackData> trackData;
     private OnItemClickListener listener;

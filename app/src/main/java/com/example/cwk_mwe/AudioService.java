@@ -1,6 +1,5 @@
 package com.example.cwk_mwe;
 
-import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,15 +10,16 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A foreground service that manages audiobook playback in the background. Handles all service related features in one spot
+ */
+
 public class AudioService extends Service {
-
-    // TODO:
-    // - Not MVVM adherent
-
     // Action Variables
     public static final String ACTION_PLAY = "com.example.cwk_mwe.ACTION_PLAY";
     public static final String ACTION_PAUSE = "com.example.cwk_mwe.ACTION_PAUSE";
@@ -103,9 +103,6 @@ public class AudioService extends Service {
                         audiobookPlayer.play();
                         notificationHelper.updateNotification("Playing Audio");
                         checkPlayerState("ACTION_PLAY");
-                    } else {
-                        Log.w("AudioService", "(play command ignored)");
-                        checkPlayerState("ACTION_PLAY");
                     }
                     break;
 
@@ -113,9 +110,6 @@ public class AudioService extends Service {
                     if (audiobookPlayer.getState() == AudiobookPlayer.AudiobookPlayerState.PLAYING) {
                         audiobookPlayer.pause();
                         notificationHelper.updateNotification("Paused Audio");
-                        checkPlayerState("ACTION_PAUSE");
-                    } else {
-                        Log.w("AudioService", "(pause command ignored)");
                         checkPlayerState("ACTION_PAUSE");
                     }
                     break;

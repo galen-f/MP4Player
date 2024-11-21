@@ -12,6 +12,11 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+/**
+ * A shared ViewModel for managing global background color and playback speed settings.
+ * Enables persistence across any activity.
+ */
+
 public class GlobalSharedViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> backgroundColor = new MutableLiveData<>(Color.WHITE);
     private final MutableLiveData<Float> playbackSpeed = new MutableLiveData<>(1.0f);
@@ -22,11 +27,12 @@ public class GlobalSharedViewModel extends AndroidViewModel {
         loadPlaybackSpeed();
     }
 
+    // Background color methods
     public LiveData<Integer> getBackgroundColor() {
         return backgroundColor;
     }
 
-    public void setBackgroundColor(String color) {
+    public void setBackgroundColor(String color) { // Fuck your HCI, specs said to change the colors.
         int parsedColor;
         switch (color) {
             case "Red":
@@ -52,7 +58,6 @@ public class GlobalSharedViewModel extends AndroidViewModel {
         String color = getApplication()
                 .getSharedPreferences("SettingsPrefs", Application.MODE_PRIVATE)
                 .getString("background_color", "White");
-
         setBackgroundColor(color);
     }
 
@@ -64,8 +69,16 @@ public class GlobalSharedViewModel extends AndroidViewModel {
                 .apply();
     }
 
+    public void applyBackgroundColor(LifecycleOwner owner, View targetView) {
+        getBackgroundColor().observe(owner, color -> {
+            if (color != null) {
+                targetView.setBackgroundColor(color);
+            }
+        });
+    }
 
-    public LiveData<Float> getPlaybackSpeed() {
+    // Playback speed methods
+    public LiveData<Float> getPlaybackSpeed() { // This thing isn't used but it feels weird to delete
         return playbackSpeed;
     }
 
@@ -98,16 +111,5 @@ public class GlobalSharedViewModel extends AndroidViewModel {
         intent.setAction(AudioService.ACTION_SET_SPEED);
         intent.putExtra("speed", playbackSpeed.getValue());
         context.startService(intent);
-    }
-
-    /**
-     * Observes background color changes and applies it dynamically to the given view.
-     */
-    public void applyBackgroundColor(LifecycleOwner owner, View targetView) {
-        getBackgroundColor().observe(owner, color -> {
-            if (color != null) {
-                targetView.setBackgroundColor(color);
-            }
-        });
     }
 }

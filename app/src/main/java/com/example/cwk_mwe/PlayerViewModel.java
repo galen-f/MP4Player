@@ -16,6 +16,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ViewModel for PlayerActivity, manages playback state, current position, duration,
+ * and bookmark creation. Handles communication with the AudioService to control those states.
+ */
+
 public class PlayerViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Integer> currentPosition = new MutableLiveData<>();
@@ -73,24 +78,11 @@ public class PlayerViewModel extends AndroidViewModel {
         return playbackSpeed;
     }
 
-    public LiveData<List<BookmarkData>> getBookmarks() {
-        return bookmarks;
-    }
-
-    public void setPlaybackSpeed(float speed) {
-        playbackSpeed = speed;
-        // Send updated speed to AudioService
-        Intent intent = new Intent(context, AudioService.class);
-        intent.setAction(AudioService.ACTION_SET_SPEED);
-        intent.putExtra("speed", speed);
-        context.startService(intent);
-    }
-
     public void play(String filePath) {
         Intent intent = new Intent(context, AudioService.class);
         intent.setAction(AudioService.ACTION_PLAY);
         intent.putExtra("FILE_PATH", filePath);
-        context.startService(intent);
+        context.startService(intent); // I miss my girlfriend
         currentFilePath.postValue(filePath);
     }
 
@@ -131,6 +123,7 @@ public class PlayerViewModel extends AndroidViewModel {
 
         BookmarkData bookmark = new BookmarkData(filePath, timeStamp, title);
         boolean success = BookmarkManager.addBookmark(context, bookmark);
+        // Notify user of outcome. User will not see the bookmark be created until they navigate back to Main, so this is important
         if (success) {
             Toast.makeText(context, "Bookmark added successfully", Toast.LENGTH_SHORT).show();
         } else {

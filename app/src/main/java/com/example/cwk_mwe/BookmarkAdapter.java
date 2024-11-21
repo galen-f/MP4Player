@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * RecyclerView adapter for displaying bookmarks.
  * This spawns the modal on the MainActivity to display bookmarks.
+ * Allows user to start playback from the specified timestamp.
  */
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder> {
     private final List<BookmarkData> bookmarks;

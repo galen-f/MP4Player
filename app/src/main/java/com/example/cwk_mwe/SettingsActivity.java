@@ -12,6 +12,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.cwk_mwe.databinding.ActivitySettingsBinding;
 
+/**
+ * View class for settings, including playback speed and background color rendering.
+ * Provides UI components for user interaction and sends changes off to control the application.
+ */
 
 public class SettingsActivity extends AppCompatActivity {
     private SettingsViewModel settingsViewModel;
@@ -59,7 +63,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void setupColorSpinner() {
+    private void setupColorSpinner() { // Why is it called a spinner and not a dropdown? I don't know, I have have so much caffeine why is this coursework only 25%
         Spinner colorSpinner = findViewById(R.id.color_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,

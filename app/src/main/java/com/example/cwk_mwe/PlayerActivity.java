@@ -11,10 +11,17 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.cwk_mwe.databinding.ActivityPlayerBinding;
 
+/**
+ * Represents the View for the track player screen. Displays playback progress,
+ * allows control actions (play, pause, stop, skip).
+ *
+ * Side note but if someone is reading this, why are we calling these audiobooks and then linking to
+ * a song downloading site in the specs. It really seems like a music playing app.
+ */
+
 public class PlayerActivity extends AppCompatActivity {
     private GlobalSharedViewModel globalSharedViewModel;
     private PlayerViewModel playerViewModel;
-    private SeekBar seekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +45,8 @@ public class PlayerActivity extends AppCompatActivity {
                 navigateToHome();
             }
         });
-
-        // Play Audio as soon as the activity is created
+        // Play Audio as soon as the activity is created, saves the user having to click the file and THEN the play button
+        // Two clicks in this economy is crazyyyyy
         playAudio();
     }
 
@@ -47,6 +54,7 @@ public class PlayerActivity extends AppCompatActivity {
         String filePath = getIntent().getStringExtra("FILE_PATH");
         if (filePath != null) {
             playerViewModel.play(filePath);
+            // If a timestamp is provided, seek to that position (Only happens with bookmarks)
             long timestampLong = getIntent().getLongExtra("TIMESTAMP", 0);
             int timestamp = (int) timestampLong;
             if (timestamp > 0) {
@@ -65,7 +73,8 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void navigateToHome() {
-        // Navigate to home activity
+        // Navigate to home activity, used to keep the user off playeractivity when there is no file path selected.
+        // This caused a lot of issues and its easier to just not allow them on, than deal with those issues.
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }

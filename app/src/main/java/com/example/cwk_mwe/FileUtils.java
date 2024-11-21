@@ -5,6 +5,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Utility class for file-related operations, including retrieving a list of MP3 files from
+ * the device's Music directory.
+ */
+
 public class FileUtils {
 
     // Method to get a list of MP3 files from the Music directory

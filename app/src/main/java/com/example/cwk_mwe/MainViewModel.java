@@ -16,6 +16,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The ViewModel for MainActivity, managing and exposing data related to audio tracks
+ * and bookmarks. Handles permissions, loading tracks from storage, and navigating to settings.
+ */
+
 public class MainViewModel extends AndroidViewModel {
     private final MutableLiveData<List<TrackData>> _trackData = new MutableLiveData<>(new ArrayList<>());
     public LiveData<List<TrackData>> trackData = _trackData;

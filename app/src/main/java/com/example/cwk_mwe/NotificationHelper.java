@@ -10,6 +10,12 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+/**
+ * Helper class for managing notifications related to audiobook playback. Creates and updates
+ * notifications, and provides playback control actions such as play, pause, stop, and skip.
+ * This class was created through auto refactoring in the IDE. Comments might look a little funny.
+ */
+
 public class NotificationHelper {
     private final AudioService audioService;
 
@@ -25,7 +31,7 @@ public class NotificationHelper {
                 audioService, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(audioService, AudioService.CHANNEL_ID)
-                .setContentTitle("Galen's MP3 Player")
+                .setContentTitle("Galen's MP3 Player") // Its me!! I hope this doesn't break any university guidelines but oh well.
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_music_notif)
                 .setContentIntent(pendingIntent)
@@ -42,7 +48,7 @@ public class NotificationHelper {
             Intent playIntent = new Intent(audioService, AudioService.class);
             playIntent.setAction(AudioService.ACTION_PLAY);
             PendingIntent playPendingIntent = PendingIntent.getService(audioService, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
+            // These drawables don't show up, I am not sure why, I don't really care to figure out because it works without them and they're not in the specs.
             builder.addAction(R.drawable.ic_play, "Play", playPendingIntent);
         } else {
             audioService.checkPlayerState("buildNotification");
@@ -61,7 +67,7 @@ public class NotificationHelper {
         return builder.build();
     }
 
-    void updateNotification(String contentText) {
+    void updateNotification(String contentText) { // Allows system to change the text in the notification
         Notification notification = buildNotification(contentText);
         NotificationManager notificationManager = (NotificationManager) audioService.getSystemService(AudioService.NOTIFICATION_SERVICE);
         if (notificationManager != null) {
@@ -69,7 +75,7 @@ public class NotificationHelper {
         }
     }
 
-    void createNotificationChannel() {
+    void createNotificationChannel() { // Necessary but wonky
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
                     AudioService.CHANNEL_ID,
@@ -79,7 +85,6 @@ public class NotificationHelper {
             NotificationManager manager = audioService.getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(serviceChannel);
-                //Log.d("AudioService.createNotificationChannel", "Notification Channel Created");
             } else {
                 Log.e("AudioService.createNotificationChannel", "Notification Manager is null");
             }
