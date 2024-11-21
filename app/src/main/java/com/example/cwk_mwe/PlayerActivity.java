@@ -2,6 +2,7 @@ package com.example.cwk_mwe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -61,7 +62,7 @@ public class PlayerActivity extends AppCompatActivity {
                 playerViewModel.seek(timestamp);
             }
         } else {
-            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+            Log.e("PlayerActivity", "No file path provided");
         }
 
         // Request updated playback speed from AudioService
