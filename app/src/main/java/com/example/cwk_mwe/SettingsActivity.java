@@ -1,7 +1,6 @@
 package com.example.cwk_mwe;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
@@ -16,19 +15,19 @@ import com.example.cwk_mwe.databinding.ActivitySettingsBinding;
 
 public class SettingsActivity extends AppCompatActivity {
     private SettingsViewModel settingsViewModel;
-    private AppSharedViewModel appSharedViewModel;
+    private GlobalSharedViewModel globalSharedViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        appSharedViewModel = new ViewModelProvider(this).get(AppSharedViewModel.class);
-        appSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
+        globalSharedViewModel = new ViewModelProvider(this).get(GlobalSharedViewModel.class);
+        globalSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
 
         // Data binding setup
         ActivitySettingsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
         settingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
-        settingsViewModel.setContext(this, appSharedViewModel);
+        settingsViewModel.setContext(this, globalSharedViewModel);
         binding.setViewModel(settingsViewModel);
         binding.setLifecycleOwner(this);
 
@@ -74,7 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
         final boolean[] isSpinnerUpdateFromObserver = {false};
 
         // Observe the background color LiveData
-        appSharedViewModel.getBackgroundColor().observe(this, color -> {
+        globalSharedViewModel.getBackgroundColor().observe(this, color -> {
             if (!isSpinnerUpdateFromObserver[0]) {
                 // Get the current color name
                 String currentColor = getApplication()
@@ -97,7 +96,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 // Prevent feedback loop by marking updates from spinner
                 isSpinnerUpdateFromObserver[0] = true;
-                appSharedViewModel.setBackgroundColor(selectedColor);
+                globalSharedViewModel.setBackgroundColor(selectedColor);
                 isSpinnerUpdateFromObserver[0] = false; // Reset the flag
             }
 

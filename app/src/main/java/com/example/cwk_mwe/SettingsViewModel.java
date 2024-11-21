@@ -6,16 +6,16 @@ import android.content.Intent;
 import androidx.lifecycle.ViewModel;
 
 public class SettingsViewModel extends ViewModel {
-    private AppSharedViewModel appSharedViewModel;
+    private GlobalSharedViewModel globalSharedViewModel;
     private Context context;
 
-    public void setContext(Context context, AppSharedViewModel sharedViewModel) {
+    public void setContext(Context context, GlobalSharedViewModel sharedViewModel) {
         this.context = context;
-        this.appSharedViewModel = sharedViewModel;
+        this.globalSharedViewModel = sharedViewModel;
     }
 
-    public void updatePlaybackSpeed(int progress) {if (appSharedViewModel != null) {
-        appSharedViewModel.setPlaybackSpeed(progress);
+    public void updatePlaybackSpeed(int progress) {if (globalSharedViewModel != null) {
+        globalSharedViewModel.setPlaybackSpeed(progress);
     }
     }
 

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -21,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cwk_mwe.databinding.ActivityMainBinding;
-import com.example.cwk_mwe.databinding.ActivityPlayerBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView emptyView;
     private MusicRecyclerViewAdapter adapter;
     private MainViewModel mainViewModel;
-    private AppSharedViewModel appSharedViewModel;
+    private GlobalSharedViewModel globalSharedViewModel;
     private AlertDialog bookmarkDialog;
     private static final int PERMISSION_REQ_CODE = 100;
 
@@ -46,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        appSharedViewModel = new ViewModelProvider(this).get(AppSharedViewModel.class);
-        appSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
+        globalSharedViewModel = new ViewModelProvider(this).get(GlobalSharedViewModel.class);
+        globalSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
 
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 

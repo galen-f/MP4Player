@@ -2,7 +2,6 @@ package com.example.cwk_mwe;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -13,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.cwk_mwe.databinding.ActivityPlayerBinding;
 
 public class PlayerActivity extends AppCompatActivity {
-    private AppSharedViewModel appSharedViewModel;
+    private GlobalSharedViewModel globalSharedViewModel;
     private PlayerViewModel playerViewModel;
     private SeekBar seekBar;
 
@@ -22,8 +21,8 @@ public class PlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        appSharedViewModel = new ViewModelProvider(this).get(AppSharedViewModel.class);
-        appSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
+        globalSharedViewModel = new ViewModelProvider(this).get(GlobalSharedViewModel.class);
+        globalSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
 
         ActivityPlayerBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_player);
 

@@ -12,11 +12,11 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-public class AppSharedViewModel extends AndroidViewModel {
+public class GlobalSharedViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> backgroundColor = new MutableLiveData<>(Color.WHITE);
     private final MutableLiveData<Float> playbackSpeed = new MutableLiveData<>(1.0f);
 
-    public AppSharedViewModel(@NonNull Application application) {
+    public GlobalSharedViewModel(@NonNull Application application) {
         super(application);
         loadBackgroundColor();
         loadPlaybackSpeed();
