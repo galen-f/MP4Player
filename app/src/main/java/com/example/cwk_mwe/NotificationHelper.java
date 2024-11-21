@@ -82,6 +82,10 @@ public class NotificationHelper {
                     "Audio Service Channel",
                     NotificationManager.IMPORTANCE_DEFAULT
             );
+
+            // Remove sound for this channel, otherwise you get a notif sound every time you update or build the notif its awful.
+            serviceChannel.setSound(null, null);
+
             NotificationManager manager = audioService.getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(serviceChannel);
