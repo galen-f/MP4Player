@@ -15,6 +15,7 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/background_color"
         tools:context=".MainActivity">
 
         <!-- Settings Button -->
@@ -32,6 +33,7 @@
 
         <TextView
             android:id="@+id/empty_message"
+            android:textColor="@color/text_color"
             android:layout_width="162dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="124dp"
@@ -43,28 +45,49 @@
             app:layout_constraintStart_toEndOf="@+id/recyclerView"
             app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
 
-        <Button
-            android:id="@+id/settingsBtn"
-            android:layout_width="150dp"
+        <LinearLayout
+            android:id="@+id/buttonRow"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:onClick="@{() -> viewModel.navigateToSettings(context)}"
-            android:text="@string/settingsBtn"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.15"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="15dp"
+            android:gravity="center"
 
-        <Button
-            android:id="@+id/bookmarksBtn"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:onClick="@{() -> viewModel.loadBookmarks()}"
-            android:text="@string/bookmarksBtn"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/settingsBtn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="32dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="64dp"
+            android:src="@drawable/ic_settings"
+            app:tint="@color/primary_color"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/settingsBtn"
+            android:onClick="@{() -> viewModel.navigateToSettings(context)}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias=".85"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <ImageButton
+            android:id="@+id/bookmarksBtn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="32dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="64dp"
+            android:src="@drawable/ic_bookmarks"
+            app:tint="@color/primary_color"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/bookmarksBtn"
+            android:onClick="@{() -> viewModel.loadBookmarks()}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

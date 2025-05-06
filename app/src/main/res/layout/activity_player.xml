@@ -11,92 +11,132 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".PlayerActivity">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_color"
 
-        <!-- Play/Pause Button -->
-        <Button
-            android:id="@+id/playBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:onClick= "@{() -> viewModel.play(viewModel.getCurrentFilePath)}"
-            android:text="@string/playBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/pauseBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:onClick="@{() -> viewModel.pause()}"
-            android:text="@string/pauseBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/playBtn" />
-
-        <!-- Stop Button -->
-        <Button
-            android:id="@+id/stopBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:onClick="@{() -> viewModel.stop()}"
-            android:text="@string/stopBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/pauseBtn" />
-
-        <!-- Skip Button -->
-        <Button
-            android:id="@+id/skipBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:onClick="@{() -> viewModel.skip()}"
-            android:text="@string/skipBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/stopBtn" />
-
-        <Button
-            android:id="@+id/bookmarkBtn"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
-            android:onClick="@{() -> viewModel.addBookmark()}"
-            android:text="@string/add_bookmark"
-            app:layout_constraintBottom_toTopOf="@+id/homeBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" />
+        tools:context=".PlayerActivity">
 
         <SeekBar
             android:id="@+id/seekBar"
             android:layout_width="350dp"
             android:layout_height="25dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="256dp"
             android:max="@{viewModel.duration}"
             android:progress="@{viewModel.currentPosition}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/skipBtn" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/buttonRow"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="32dp"
+            android:layout_marginHorizontal="15dp"
+            android:gravity="center"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/seekBar"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Play Button -->
+            <ImageButton
+                android:id="@+id/playBtn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_play"
+                app:tint="@color/primary_color"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/playBtn"
+                android:onClick="@{() -> viewModel.play(viewModel.getCurrentFilePath)}"
+                android:layout_marginHorizontal="15dp"
+                />
+
+            <!-- Pause Button -->
+            <ImageButton
+                android:id="@+id/pauseBtn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_pause"
+                app:tint="@color/primary_color"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/pauseBtn"
+                android:onClick="@{() -> viewModel.pause()}"
+                android:layout_marginHorizontal="15dp"
+                />
+
+            <!-- Stop Button -->
+            <ImageButton
+                android:id="@+id/stopBtn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_stop"
+                app:tint="@color/primary_color"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/stopBtn"
+                android:onClick="@{() -> viewModel.stop()}"
+                android:layout_marginHorizontal="15dp"
+                />
+
+            <!-- skip Button -->
+            <ImageButton
+                android:id="@+id/skipBtn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_skip"
+                app:tint="@color/primary_color"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/skipBtn"
+                android:onClick="@{() -> viewModel.skip()}"
+                android:layout_marginHorizontal="15dp"
+                />
+
+        </LinearLayout>
+
+
+
+
+        <ImageButton
+            android:id="@+id/bookmarkBtn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="64dp"
+            android:src="@drawable/ic_bookmark_add"
+            app:tint="@color/primary_color"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/add_bookmark"
+            android:onClick="@{() -> viewModel.addBookmark()}"
+            app:layout_constraintBottom_toTopOf="@+id/homeBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+             />
+
 
         <!-- Home Button -->
-        <Button
+        <ImageButton
             android:id="@+id/homeBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+
+            android:layout_marginBottom="64dp"
+            android:src="@drawable/home_icon"
+            app:tint="@color/primary_color"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/homeBtn"
             android:onClick="@{() -> viewModel.navigateToHome(context)}"
-            android:text="@string/homeBtn"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

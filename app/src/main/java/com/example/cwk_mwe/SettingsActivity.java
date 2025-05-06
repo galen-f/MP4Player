@@ -26,7 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         globalSharedViewModel = new ViewModelProvider(this).get(GlobalSharedViewModel.class);
-        globalSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
+//        globalSharedViewModel.applyBackgroundColor(this, findViewById(android.R.id.content));
 
         // Data binding setup
         ActivitySettingsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_settings);
@@ -36,7 +36,7 @@ public class SettingsActivity extends AppCompatActivity {
         binding.setLifecycleOwner(this);
 
         setupSpeedSeekBar();
-        setupColorSpinner();
+//        setupColorSpinner();
     }
 
     private void setupSpeedSeekBar() {
@@ -63,51 +63,51 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
-    private void setupColorSpinner() { // Why is it called a spinner and not a dropdown? I don't know, I have have so much caffeine why is this coursework only 25%
-        Spinner colorSpinner = findViewById(R.id.color_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this,
-                R.array.color_options,
-                android.R.layout.simple_spinner_item
-        );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        colorSpinner.setAdapter(adapter);
-
-        // Flag to avoid feedback loop
-        final boolean[] isSpinnerUpdateFromObserver = {false};
-
-        // Observe the background color LiveData
-        globalSharedViewModel.getBackgroundColor().observe(this, color -> {
-            if (!isSpinnerUpdateFromObserver[0]) {
-                // Get the current color name
-                String currentColor = getApplication()
-                        .getSharedPreferences("SettingsPrefs", MODE_PRIVATE)
-                        .getString("background_color", "White");
-
-                int position = adapter.getPosition(currentColor);
-                if (position >= 0 && position != colorSpinner.getSelectedItemPosition()) {
-                    // Only set spinner selection if it has changed
-                    colorSpinner.setSelection(position);
-                }
-            }
-        });
-
-        // Set up a listener for color selection
-        colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, android.view.View view, int position, long id) {
-                String selectedColor = parent.getItemAtPosition(position).toString();
-
-                // Prevent feedback loop by marking updates from spinner
-                isSpinnerUpdateFromObserver[0] = true;
-                globalSharedViewModel.setBackgroundColor(selectedColor);
-                isSpinnerUpdateFromObserver[0] = false; // Reset the flag
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // No action needed
-            }
-        });
-    }
+////    private void setupColorSpinner() { // Why is it called a spinner and not a dropdown? I don't know, I have have so much caffeine why is this coursework only 25%
+////        Spinner colorSpinner = findViewById(R.id.color_spinner);
+////        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+////                this,
+////                R.array.color_options,
+////                android.R.layout.simple_spinner_item
+////        );
+////        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+////        colorSpinner.setAdapter(adapter);
+////
+////        // Flag to avoid feedback loop
+////        final boolean[] isSpinnerUpdateFromObserver = {false};
+////
+////        // Observe the background color LiveData
+////        globalSharedViewModel.getBackgroundColor().observe(this, color -> {
+////            if (!isSpinnerUpdateFromObserver[0]) {
+////                // Get the current color name
+////                String currentColor = getApplication()
+////                        .getSharedPreferences("SettingsPrefs", MODE_PRIVATE)
+////                        .getString("background_color", "White");
+////
+////                int position = adapter.getPosition(currentColor);
+////                if (position >= 0 && position != colorSpinner.getSelectedItemPosition()) {
+////                    // Only set spinner selection if it has changed
+////                    colorSpinner.setSelection(position);
+////                }
+////            }
+////        });
+//
+//        // Set up a listener for color selection
+//        colorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, android.view.View view, int position, long id) {
+//                String selectedColor = parent.getItemAtPosition(position).toString();
+//
+//                // Prevent feedback loop by marking updates from spinner
+//                isSpinnerUpdateFromObserver[0] = true;
+//                globalSharedViewModel.setBackgroundColor(selectedColor);
+//                isSpinnerUpdateFromObserver[0] = false; // Reset the flag
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//                // No action needed
+//            }
+//        });
+//    }
 }

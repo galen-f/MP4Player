@@ -14,6 +14,7 @@
         android:id="@+id/nav_settings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/background_color"
         tools:context=".SettingsActivity">
 
         <SeekBar
@@ -21,7 +22,7 @@
             style="@style/Widget.AppCompat.SeekBar.Discrete"
             android:layout_width="377dp"
             android:layout_height="21dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="42dp"
             android:max="4"
             android:progress="1"
             app:layout_constraintEnd_toEndOf="parent"
@@ -34,24 +35,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="256dp"
             android:text="@string/playback_speed"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/homeBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="50dp"
-            android:onClick="@{() -> viewModel.navigateToHome()}"
-            android:text="@string/homeBtn"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/half_speed"
@@ -107,27 +96,22 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/speed_seekbar" />
 
-        <TextView
-            android:id="@+id/background_color_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
-            android:text="@string/background_color"
-            app:layout_constraintTop_toBottomOf="@id/speed_seekbar"
+        <!-- Home Button -->
+        <ImageButton
+            android:id="@+id/homeBtn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="64dp"
+            android:src="@drawable/home_icon"
+            app:tint="@color/primary_color"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/homeBtn"
+            android:onClick="@{() -> viewModel.navigateToHome()}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.1"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <Spinner
-            android:id="@+id/color_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:entries="@array/color_options"
-            app:layout_constraintTop_toBottomOf="@id/background_color_label"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.1"
-            app:layout_constraintEnd_toEndOf="parent" />
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
